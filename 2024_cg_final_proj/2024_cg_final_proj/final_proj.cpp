@@ -3,9 +3,9 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
@@ -37,128 +37,94 @@ char* filetobuf(const char* file)
     return buf; // Return the buffer 
 }
 
+
+GLint background_width, background_height;
 float vertexPosition[] = {
-    -0.5f,0.5f,0.5f, //앞면
-    -0.5f,-0.5f,0.5f,
-     0.5f,-0.5f,0.5f,
-     0.5f,0.5f,0.5f,
+    -1.0f,1.0f,1.0f, //앞면
+    -1.0f,-1.0f,1.0f,
+     1.0f,-1.0f,1.0f,
+     1.0f,1.0f,1.0f,
 
-   -0.5f,0.5f,-0.5f, //윗면
-  -0.5f,0.5f,0.5f,
-   0.5f,0.5f,0.5f,
-   0.5f,0.5f,-0.5f,
+    -1.0f,1.0f,-1.0f, //윗면
+    -1.0f,1.0f,1.0f,
+     1.0f,1.0f,1.0f,
+     1.0f,1.0f,-1.0f,
 
-   -0.5f,0.5f,-0.5f, //왼쪽옆
-   -0.5f,-0.5f,-0.5f,
-   -0.5f,-0.5f,0.5f,
-   -0.5f,0.5f,0.5f,
+    -1.0f,1.0f,-1.0f, //왼쪽옆
+    -1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,1.0f,
+    -1.0f,1.0f,1.0f,
 
-   0.5f,0.5f,-0.5f, //뒷면
-   0.5f,-0.5f,-0.5f,
-   -0.5f,-0.5f,-0.5f,
-   -0.5f,0.5f,-0.5f,
+     1.0f,1.0f,-1.0f, //뒷면
+     1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f,1.0f,-1.0f,
 
-   -0.5f,-0.5f,0.5f, //아랫면
-   -0.5f,-0.5f,-0.5f,
-   0.5f,-0.5f,-0.5f,
-   0.5f,-0.5f,0.5f,
+    -1.0f,-1.0f,1.0f, //아랫면
+    -1.0f,-1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f,-1.0f,1.0f,
 
-   0.5f,0.5f,0.5f, //오른쪽 옆
-   0.5f,-0.5f,0.5f,
-   0.5f,-0.5f,-0.5f,
-   0.5f,0.5f,-0.5f,
+     1.0f,1.0f,1.0f, //오른쪽 옆
+     1.0f,-1.0f,1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f,1.0f,-1.0f,//24
 
    2.0f,0,0, //x,y,z 축
    -2.0f,0,0,
    0,2.0f,0,
    0,-2.0f,0,
-   0,0,4.0f,
-   0,0,-4.0f, //30
+   0,0,2.0f,
+   0,0,-2.0f, //30
 
-   //사면체
-    0, 0.5f, 0,
-   -0.5f, 0.0f, 0.5f,
-    0.5f, 0.0f, 0.5f,
-
-    0, 0.5f, 0,
-   -0.5f, 0.0f, -0.5f,
-   -0.5f, 0.0f, 0.5f,
-
-    0, 0.5f, 0,
-    0.5f, 0.0f, 0.5f,
-    0.5f, 0.0f, -0.5f,
-
-    0, 0.5f, 0,
-    0.5f, 0.0f, -0.5f,
-   -0.5f, 0.0f, -0.5f,
-
-   -0.5f, 0.0f, 0.5f,
-   -0.5f, 0.0f, -0.5f,
-    0.5f, 0.0f, -0.5f,
-    0.5f, 0.0f, 0.5f
+   -2.0f,0.0f,2.0f, //바닥
+   -2.0f,0.0f,-2.0f,
+   2.0f,0.0f,-2.0f,
+   2.0f,0.0f,2.0f// 34
 };//정육면체, 축,정사면체 벡터들
-float vertexColor[] = {
-   0,1,1,
-   0,0,1,
-   1,0,1,
-   1,1,1,
+float vertexNormal[] = {
+   0.0f, 0.0f, 1.0f,//앞면
+   0.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f,
 
-   0,1,0,
-   0,1,1,
-   1,1,1,
-   1,1,0,
+   0.0f, 1.0f, 0.0f,//윗면
+   0.0f, 1.0f, 0.0f,
+   0.0f, 1.0f, 0.0f,
+   0.0f, 1.0f, 0.0f,
 
-   0,1,0,
-   0,0,0,
-   0,0,1,
-   0,1,1,
+   -1.0f, 0.0f, 0.0f,//왼면
+   -1.0f, 0.0f, 0.0f,
+   -1.0f, 0.0f, 0.0f,
+   -1.0f, 0.0f, 0.0f,
 
-   1,1,0,
-   1,0,0,
-   0,0,0,
-   0,1,0,
+   0.0f,0.0f,-1.0f,//뒷면
+   0.0f,0.0f,-1.0f,
+   0.0f,0.0f,-1.0f,
+   0.0f,0.0f,-1.0f,
 
-   0,0,1,
-   0,0,0,
-   1,0,0,
-   1,0,1,
+   0.0f,-1.0f,0.0f,//아래
+   0.0f,-1.0f,0.0f,
+   0.0f,-1.0f,0.0f,
+   0.0f,-1.0f,0.0f,
 
-   1,1,1,
-   1,0,1,
-   1,0,0,
-   1,1,0,
-
+   1.0f,0.0f,0.0f,//오른쪽
+   1.0f,0.0f,0.0f,
+   1.0f,0.0f,0.0f,
+   1.0f,0.0f,0.0f,
 
    //선
-   0,0,0,
-   0,0,0,
-   0,0,0,
-   0,0,0,
-   0,0,0,
-   0,0,0,
+   1.0,0.0,0.0,
+   -1.0,0.0,0.0,
+   0.0,1.0,0.0,
+   0.0,-1.0,0.0,
+   0.0,0.0,1.0,
+   0.0,0.0,-1.0,
 
-
-   //정사면체
-   0,1,1,
-   0,0,1,
-   1,0,1,
-
-   0,1,1,
-   1,1,0,
-   0,0,1,
-
-   0,1,1,
-   1,0,1,
-   1,0,0,
-
-   0,1,1,
-   1,0,0,
-   1,1,0,
-
-    0,0,1,
-    1,1,0,
-    1,0,0,
-    1,0,1,
+   0.0f,1.0f,0.0f,//아래
+   0.0f,1.0f,0.0f,
+   0.0f,1.0f,0.0f,
+   0.0f,1.0f,0.0f
 };//정육면체, 축,정사면체 색깔들
 
 GLchar* vertexSource, * fragmentSource;
@@ -169,11 +135,12 @@ GLuint fragmentShader;
 int main(int argc, char** argv)
 {
     srand(time(NULL));
+    background_width = 800, background_height = 800;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
     glutInitWindowPosition(100, 100);
-    glutInitWindowSize(800, 800);
+    glutInitWindowSize(background_width, background_height);
     glutCreateWindow("2024_Computer_Graphics_Final_Project");
 
     glewExperimental = GL_TRUE;
@@ -261,7 +228,6 @@ GLuint make_shaderProgram()
 
     return ShaderProgramID;
 }
-bool depth = false;
 GLuint VAO, VBO[2];
 void InitBuffer()
 {
@@ -283,13 +249,15 @@ void InitBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
     //--- 변수 colors에서 버텍스 색상을 복사한다.
     //--- colors 배열의 사이즈: 9 *float 
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(vertexColor), vertexColor, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(vertexNormal), vertexNormal, GL_STATIC_DRAW);
     //--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     //--- attribute 인덱스 1번을 사용 가능하게 함.
     glEnableVertexAttribArray(1);
 
 }
+
+GLfloat camera_move[3]{ 0.0f, 0.0f, 1.0f };
 
 GLvoid drawScene()
 {
@@ -301,9 +269,63 @@ GLvoid drawScene()
 
     glEnable(GL_DEPTH_TEST);
 
-    unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
-    unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
-    unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
+    //그냥 맵===================================================================================================================================================================================
+    {
+        glViewport(0, 0, background_width, background_height);
+
+        unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
+        unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
+        unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
+
+        //원근 투영
+        glm::mat4 kTransform = glm::mat4(1.0f);
+        kTransform = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+        kTransform = glm::translate(kTransform, glm::vec3(0.0, 0.0, -8.0f));
+        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
+
+        //뷰잉 변환
+        glm::mat4 vTransform = glm::mat4(1.0f);
+        glm::vec3 cameraPos = glm::vec3(camera_move[0], camera_move[1], camera_move[2]); //--- 카메라 위치
+        glm::vec3 cameraDirection = glm::vec3(camera_move[0], camera_move[1], camera_move[2] - 1.0f); //--- 카메라 바라보는 방향
+        glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
+
+        vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+        vTransform = glm::rotate(vTransform, glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0));
+        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
+
+        //축
+        glm::mat4 axisTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
+        axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
+
+        unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
+        unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
+        unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
+        
+        //조명 위치 및 색
+        glUniform3f(lightPosLocation, 0.0f, 2.0f, 0.0f);
+        glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
+
+        //오브젝트 색 지정
+        glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
+        glDrawArrays(GL_QUADS, 0, 24); //정육면체
+
+        glUniform3f(objColorLocation, 0.2, 0.2, 0.2);
+        glDrawArrays(GL_LINES, 24, 6); //축
+    }
+
+    //미니 맵===================================================================================================================================================================================
+    {
+        glViewport(0, 0, background_width, background_height); /*대충 오른쪽상단 어딘가에 배치 바라요*/
+
+        unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
+        unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
+        unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
+
+        unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
+        unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
+        unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
+    }
 
     glutSwapBuffers();
 }
