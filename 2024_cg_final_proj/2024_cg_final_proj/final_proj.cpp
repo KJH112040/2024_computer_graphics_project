@@ -9,6 +9,14 @@
 #include <Windows.h>
 #include <time.h>
 
+struct Robot {
+    GLfloat bb[2][3], //왼쪽 상단, 오른쪽 하단
+        size, x, y,
+        shake, y_radian, // shake = (발,다리)회전 각도, radian = 몸 y축 회전 각도
+        color;
+    bool move; // 움직이고 있는지(대기 후 이동)
+};
+
 GLvoid drawScene();
 GLvoid KeyBoard(unsigned char key, int x, int y);
 GLvoid SpecialKeyBoard(int key, int x, int y);
@@ -40,91 +48,91 @@ char* filetobuf(const char* file)
 
 GLint background_width, background_height;
 float vertexPosition[] = {
-    -1.0f,1.0f,1.0f, //앞면
-    -1.0f,-1.0f,1.0f,
-     1.0f,-1.0f,1.0f,
-     1.0f,1.0f,1.0f,
+    -1.0f, 1.0f, 1.0f, //앞면
+    -1.0f,-1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
 
-    -1.0f,1.0f,-1.0f, //윗면
-    -1.0f,1.0f,1.0f,
-     1.0f,1.0f,1.0f,
-     1.0f,1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f, //윗면
+    -1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,
 
-    -1.0f,1.0f,-1.0f, //왼쪽옆
+    -1.0f, 1.0f,-1.0f, //왼쪽옆
     -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,1.0f,
-    -1.0f,1.0f,1.0f,
-
-     1.0f,1.0f,-1.0f, //뒷면
+    -1.0f,-1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+    
+     1.0f, 1.0f,-1.0f, //뒷면
      1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
-    -1.0f,1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f,
 
-    -1.0f,-1.0f,1.0f, //아랫면
+    -1.0f,-1.0f, 1.0f, //아랫면
     -1.0f,-1.0f,-1.0f,
      1.0f,-1.0f,-1.0f,
-     1.0f,-1.0f,1.0f,
+     1.0f,-1.0f, 1.0f,
 
-     1.0f,1.0f,1.0f, //오른쪽 옆
-     1.0f,-1.0f,1.0f,
+     1.0f, 1.0f, 1.0f, //오른쪽 옆
+     1.0f,-1.0f, 1.0f,
      1.0f,-1.0f,-1.0f,
-     1.0f,1.0f,-1.0f,//24
+     1.0f, 1.0f,-1.0f,//24
 
-   2.0f,0,0, //x,y,z 축
-   -2.0f,0,0,
-   0,2.0f,0,
-   0,-2.0f,0,
-   0,0,2.0f,
-   0,0,-2.0f, //30
+     1.0f, 0.0f, 0.0f, //x,y,z 축
+    -1.0f, 0.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+     0.0f,-1.0f, 0.0f,
+     0.0f, 0.0f, 1.0f,
+     0.0f, 0.0f,-1.0f, //30
 
-   -2.0f,0.0f,2.0f, //바닥
-   -2.0f,0.0f,-2.0f,
-   2.0f,0.0f,-2.0f,
-   2.0f,0.0f,2.0f// 34
+    -1.0f, 0.0f, 1.0f, //바닥
+    -1.0f, 0.0f,-1.0f,
+     1.0f, 0.0f,-1.0f,
+     1.0f, 0.0f, 1.0f// 34
 };//정육면체, 축,정사면체 벡터들
 float vertexNormal[] = {
-   0.0f, 0.0f, 1.0f,//앞면
-   0.0f, 0.0f, 1.0f,
-   0.0f, 0.0f, 1.0f,
-   0.0f, 0.0f, 1.0f,
+     0.0f, 0.0f, 1.0f,//앞면
+     0.0f, 0.0f, 1.0f,
+     0.0f, 0.0f, 1.0f,
+     0.0f, 0.0f, 1.0f,
 
-   0.0f, 1.0f, 0.0f,//윗면
-   0.0f, 1.0f, 0.0f,
-   0.0f, 1.0f, 0.0f,
-   0.0f, 1.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,//윗면
+     0.0f, 1.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
 
-   -1.0f, 0.0f, 0.0f,//왼면
-   -1.0f, 0.0f, 0.0f,
-   -1.0f, 0.0f, 0.0f,
-   -1.0f, 0.0f, 0.0f,
+    -1.0f, 0.0f, 0.0f,//왼면
+    -1.0f, 0.0f, 0.0f,
+    -1.0f, 0.0f, 0.0f,
+    -1.0f, 0.0f, 0.0f,
 
-   0.0f,0.0f,-1.0f,//뒷면
-   0.0f,0.0f,-1.0f,
-   0.0f,0.0f,-1.0f,
-   0.0f,0.0f,-1.0f,
+     0.0f, 0.0f,-1.0f,//뒷면
+     0.0f, 0.0f,-1.0f,
+     0.0f, 0.0f,-1.0f,
+     0.0f, 0.0f,-1.0f,
 
-   0.0f,-1.0f,0.0f,//아래
-   0.0f,-1.0f,0.0f,
-   0.0f,-1.0f,0.0f,
-   0.0f,-1.0f,0.0f,
-
-   1.0f,0.0f,0.0f,//오른쪽
-   1.0f,0.0f,0.0f,
-   1.0f,0.0f,0.0f,
-   1.0f,0.0f,0.0f,
+     0.0f,-1.0f, 0.0f,//아래
+     0.0f,-1.0f, 0.0f,
+     0.0f,-1.0f, 0.0f,
+     0.0f,-1.0f, 0.0f,
+    
+     1.0f, 0.0f, 0.0f,//오른쪽
+     1.0f, 0.0f, 0.0f,
+     1.0f, 0.0f, 0.0f,
+     1.0f, 0.0f, 0.0f,
 
    //선
-   1.0,0.0,0.0,
-   -1.0,0.0,0.0,
-   0.0,1.0,0.0,
-   0.0,-1.0,0.0,
-   0.0,0.0,1.0,
-   0.0,0.0,-1.0,
+     1.0f, 0.0f, 0.0f,
+    -1.0f, 0.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+     0.0f,-1.0f, 0.0f,
+     0.0f, 0.0f, 1.0f,
+     0.0f, 0.0f,-1.0f,
 
-   0.0f,1.0f,0.0f,//아래
-   0.0f,1.0f,0.0f,
-   0.0f,1.0f,0.0f,
-   0.0f,1.0f,0.0f
+     0.0f, 1.0f, 0.0f,//아래
+     0.0f, 1.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+     0.0f, 1.0f, 0.0f
 };//정육면체, 축,정사면체 색깔들
 
 GLchar* vertexSource, * fragmentSource;
@@ -303,15 +311,55 @@ GLvoid drawScene()
         unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
         
         //조명 위치 및 색
-        glUniform3f(lightPosLocation, 0.0f, 2.0f, 0.0f);
+        glUniform3f(lightPosLocation, 0.0f, 3.0f, 0.0f);
         glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 
         //오브젝트 색 지정
-        glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
-        glDrawArrays(GL_QUADS, 0, 24); //정육면체
+        glUniform3f(objColorLocation, 1.0, 1.0, 1.0);
 
-        glUniform3f(objColorLocation, 0.2, 0.2, 0.2);
-        glDrawArrays(GL_LINES, 24, 6); //축
+        /*여기에 로봇*/
+        {
+            glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+            model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+            model = axisTransForm * model;
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+            glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
+            glDrawArrays(GL_QUADS, 0, 24); //정육면체
+        } 
+
+        /*이건 장애물 로봇*/
+        {
+            glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+            model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+            model = axisTransForm * model;
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+            glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
+            glDrawArrays(GL_QUADS, 0, 24); //정육면체
+        }
+
+        /*이건 일단 축*/
+        {
+            glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+            model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+            model = axisTransForm * model;
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+            glUniform3f(objColorLocation, 0.2, 0.2, 0.2);
+            glDrawArrays(GL_LINES, 24, 6); //축
+        }
+
+        /*여기는 맵(바닥)*/
+        {
+            glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+            model = glm::scale(model, glm::vec3(2.0f, 0.0f, 2.0f));
+            model = axisTransForm * model;
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+            glUniform3f(objColorLocation, 0.2, 0.2, 1.0);
+            glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+        }
     }
 
     //미니 맵===================================================================================================================================================================================
