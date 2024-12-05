@@ -17,6 +17,7 @@ struct Robot {
         size, x, z,
         shake, y_radian, // shake = (¹ß,´Ù¸®)È¸Àü °¢µµ, radian = ¸ö yÃà È¸Àü °¢µµ
         color[3];
+    int shake_dir;
     bool move; // ¿òÁ÷ÀÌ°í ÀÖ´ÂÁö(´ë±â ÈÄ ÀÌµ¿)
 };
 Robot player_robot, block_robot[9];
@@ -296,18 +297,18 @@ GLvoid drawScene()
 
         //ºäÀ× º¯È¯
         glm::mat4 vTransform = glm::mat4(1.0f);
-        glm::vec3 cameraPos = glm::vec3(camera_move[0], camera_move[1], camera_move[2]); //--- Ä«¸Þ¶ó À§Ä¡
-        glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- Ä«¸Þ¶ó ¹Ù¶óº¸´Â ¹æÇâ
+        glm::vec3 cameraPos = glm::vec3(player_robot.x, 1.0f, player_robot.z + 1.0f); //--- Ä«¸Þ¶ó À§Ä¡
+        glm::vec3 cameraDirection = glm::vec3(player_robot.x, 0.0f, player_robot.z); //--- Ä«¸Þ¶ó ¹Ù¶óº¸´Â ¹æÇâ
         glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- Ä«¸Þ¶ó À§ÂÊ ¹æÇâ
 
-        vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
         vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0));
-        vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
+        vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+        //vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
 
         //Ãà
         glm::mat4 axisTransForm = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
-        axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0));
+        axisTransForm = glm::rotate(axisTransForm, glm::radians(00.0f), glm::vec3(1.0, 0.0, 0.0));
         axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//º¯È¯ Çà·ÄÀ» ¼ÎÀÌ´õ¿¡ Àü´Þ
 
@@ -647,6 +648,11 @@ GLvoid Reshape(int w, int h)
 GLvoid KeyBoard(unsigned char key, int x, int y) 
 {
     switch (key) {
+    case 'm':
+        player_robot.y_radian = 180.0f;
+        player_robot.move = true;
+        player_robot.shake_dir = 1;
+        break;
     case 'q':
         glutLeaveMainLoop();
         break;
@@ -672,7 +678,11 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 GLvoid TimerFunc(int x) 
 {
     if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
-        
+        player_robot.x += sin(glm::radians(player_robot.y_radian));
+        player_robot.z += cos(glm::radians(player_robot.y_radian));
+        player_robot.shake += player_robot.shake_dir;
+        if (player_robot.shake <= 60.0f || player_robot.shake >= 60.0f)
+            player_robot.shake_dir *= -1;
     }
     /*Á¤Çý¾¾ ÀÌ switch »©°í ½Í¾î¿ä ÀÌ·± ÀúÀÇ ¸¾ ¾Ë¾ÆÁÙ±î¿ä?*/
     switch (x)
