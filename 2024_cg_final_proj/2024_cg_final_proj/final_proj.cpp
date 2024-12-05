@@ -6,9 +6,9 @@
 #include <gl/glm/glm/glm.hpp>
 #include <gl/glm/glm/ext.hpp>
 #include <gl/glm/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
@@ -16,9 +16,10 @@ struct Robot {
     GLfloat bb[2][3], //¿ÞÂÊ »ó´Ü, ¿À¸¥ÂÊ ÇÏ´Ü
         size, x, y,
         shake, y_radian, // shake = (¹ß,´Ù¸®)È¸Àü °¢µµ, radian = ¸ö yÃà È¸Àü °¢µµ
-        color;
+        color[3], pos[3];
     bool move; // ¿òÁ÷ÀÌ°í ÀÖ´ÂÁö(´ë±â ÈÄ ÀÌµ¿)
 };
+Robot player_robot, block_robot[9];
 
 GLvoid drawScene();
 GLvoid KeyBoard(unsigned char key, int x, int y);
@@ -47,7 +48,6 @@ char* filetobuf(const char* file)
     buf[length] = 0; // Null terminator 
     return buf; // Return the buffer 
 }
-
 
 GLint background_width, background_height;
 float vertexPosition[] = {
@@ -268,7 +268,7 @@ void InitBuffer()
 
 }
 
-GLfloat camera_move[3]{ 0.0f, 0.0f, 1.0f };
+GLfloat camera_move[3]{ 0.0f, 10.0f, 0.0f };
 
 GLvoid drawScene()
 {
@@ -290,18 +290,20 @@ GLvoid drawScene()
 
         //¿ø±Ù Åõ¿µ
         glm::mat4 kTransform = glm::mat4(1.0f);
-        kTransform = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+        kTransform = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 2000.0f);
         kTransform = glm::translate(kTransform, glm::vec3(0.0, 0.0, -8.0f));
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
         //ºäÀ× º¯È¯
         glm::mat4 vTransform = glm::mat4(1.0f);
+        //glm::vec3 cameraPos = glm::vec3(400.0f, 50.0f, 65.0f); //--- Ä«¸Þ¶ó À§Ä¡
+        //glm::vec3 cameraDirection = glm::vec3(400.0f, 0.0f, 55.0f); //--- Ä«¸Þ¶ó ¹Ù¶óº¸´Â ¹æÇâ
         glm::vec3 cameraPos = glm::vec3(camera_move[0], camera_move[1], camera_move[2]); //--- Ä«¸Þ¶ó À§Ä¡
-        glm::vec3 cameraDirection = glm::vec3(camera_move[0], camera_move[1], camera_move[2] - 1.0f); //--- Ä«¸Þ¶ó ¹Ù¶óº¸´Â ¹æÇâ
-        glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- Ä«¸Þ¶ó À§ÂÊ ¹æÇâ
+        glm::vec3 cameraDirection = glm::vec3(camera_move[0], 0.0f, camera_move[2]); //--- Ä«¸Þ¶ó ¹Ù¶óº¸´Â ¹æÇâ
+        glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); //--- Ä«¸Þ¶ó À§ÂÊ ¹æÇâ
 
         vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
-        vTransform = glm::rotate(vTransform, glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0));
+        //vTransform = glm::rotate(vTransform, glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
 
         //Ãà
@@ -322,24 +324,50 @@ GLvoid drawScene()
 
         /*¿©±â¿¡ ·Îº¿*/
         {
-            glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
-            model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = axisTransForm * model;
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
+            glm::mat4 shapeTransForm = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+            shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.pos[0], player_robot.pos[1], player_robot.pos[2]));    //robotÀ§Ä¡
+            shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f)); //º¸´Â ¹æÇâ
+            /*¿À¸¥´Ù¸®*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                //¸ö À§Ä¡¿¡ µû¶ó Á¶Á¤
+                model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                  //´Ù¸® Èçµé±â
+                model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                //¿øÁ¡Á¶Á¤
+                model = glm::scale(model, glm::vec3(0.05, 0.1, 0.05));                                                      //size
+                model = axisTransForm * shapeTransForm * model ;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
 
-            glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
-            glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /*¿Þ´Ù¸®*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                //¸ö À§Ä¡¿¡ µû¶ó Á¶Á¤
+                model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                  //´Ù¸® Èçµé±â
+                model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                //¿øÁ¡Á¶Á¤
+                model = glm::scale(model, glm::vec3(0.05, 0.1, 0.05));                                                      //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /* ¸öÅë */ {
+
+            } /*¿À¸¥ÆÈ*/ {
+                
+            } /*¿Þ  ÆÈ*/ {
+
+            } /* ¸Ó¸® */ {
+
+            }
+
         } 
 
         /*ÀÌ°Ç Àå¾Ö¹° ·Îº¿*/
-        {
+        for (int i = 0; i < 9; ++i) {
             glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
             model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
             model = axisTransForm * model;
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
             glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
-            glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            //glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
         }
 
         /*ÀÌ°Ç ÀÏ´Ü Ãà*/
@@ -604,16 +632,32 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 GLvoid SpecialKeyBoard(int key, int x, int y) 
 {
     switch (key) {
+    case GLUT_KEY_UP:
+        camera_move[1] += 0.5;
+        break;
+    case GLUT_KEY_DOWN:
+        camera_move[1] -= 0.5;
+        break;
+    case GLUT_KEY_LEFT:
+        break;
+    case GLUT_KEY_RIGHT:
+        break;
     default:
         break;
     }
     glutPostRedisplay();
 }
 
-GLvoid TimerFunc(int x) {
+GLvoid TimerFunc(int x) 
+{
+    if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
+        
+    }
+    /*Á¤Çý¾¾ ÀÌ switch »©°í ½Í¾î¿ä ÀÌ·± ÀúÀÇ ¸¾ ¾Ë¾ÆÁÙ±î¿ä?*/
     switch (x)
     {
     case 1:
+
         break;
     }
     glutTimerFunc(10, TimerFunc, 1);
