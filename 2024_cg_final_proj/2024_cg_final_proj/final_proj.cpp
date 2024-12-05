@@ -328,6 +328,7 @@ GLvoid drawScene()
             glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
             shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, 0.0f, player_robot.z));      //robot위치
             shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
+            shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
             /*오른다리*/ {
                 glUniform3f(objColorLocation, 0.0, 0.6, 0.6);
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
