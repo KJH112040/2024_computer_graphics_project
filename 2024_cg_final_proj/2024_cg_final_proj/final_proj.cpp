@@ -6,9 +6,6 @@
 #include <gl/glm/glm/glm.hpp>
 #include <gl/glm/glm/ext.hpp>
 #include <gl/glm/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
