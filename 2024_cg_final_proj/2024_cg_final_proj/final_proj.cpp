@@ -3,18 +3,19 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
 struct Robot {
     GLfloat bb[2][3], //¿ÞÂÊ »ó´Ü, ¿À¸¥ÂÊ ÇÏ´Ü
         size, x, z,
+        speed = 0.25f,
         shake, y_radian, // shake = (¹ß,´Ù¸®)È¸Àü °¢µµ, radian = ¸ö yÃà È¸Àü °¢µµ
         color[3];
     int shake_dir;
@@ -325,7 +326,7 @@ GLvoid drawScene()
         
         /*¿©±â¿¡ ·Îº¿*/
         {
-            //glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
+            glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
             glm::mat4 shapeTransForm = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
             shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, 0.0f, player_robot.z));      //robotÀ§Ä¡
             shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //º¸´Â ¹æÇâ
@@ -688,11 +689,13 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 GLvoid TimerFunc(int x) 
 {
     if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
-        player_robot.x += sin(glm::radians(player_robot.y_radian));
-        player_robot.z += cos(glm::radians(player_robot.y_radian));
-        player_robot.shake += player_robot.shake_dir;
-        if (player_robot.shake <= 60.0f || player_robot.shake >= 60.0f)
+        player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
+        player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+        player_robot.shake += player_robot.shake_dir * 10 * player_robot.speed;
+        if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
             player_robot.shake_dir *= -1;
+        if (player_robot.speed < 0.75f)
+            player_robot.speed += 0.01f;
     }
     /*Á¤Çý¾¾ ÀÌ switch »©°í ½Í¾î¿ä ÀÌ·± ÀúÀÇ ¸¾ ¾Ë¾ÆÁÙ±î¿ä?*/
     switch (x)
