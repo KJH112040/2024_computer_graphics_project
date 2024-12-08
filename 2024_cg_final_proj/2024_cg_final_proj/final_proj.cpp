@@ -3,12 +3,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-/*#include <gl/glm/glm.hpp>
+#include <gl/glm/glm.hpp>
 #include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>*/
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm/glm.hpp>
+//#include <gl/glm/glm/ext.hpp>
+//#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
@@ -416,7 +416,7 @@ GLvoid drawScene()
             /*트랙1*/
             {
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f-2.0f, 0.0f, 151.0f-0.0f));
+                model = glm::translate(model, glm::vec3(195.0f, 0.0f, 1.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -425,7 +425,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f -197.0f, 0.0f, 151.0f-150.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -149.0f));
                 model = glm::scale(model, glm::vec3(194.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -434,7 +434,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f - 392.0f, 0.0f, 151.0f-0.0f));
+                model = glm::translate(model, glm::vec3(-195.0f, 0.0f, 1.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -446,7 +446,7 @@ GLvoid drawScene()
             /*트랙2*/
             {
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f+0.0f, 0.0f, 151.0f-0.0f));
+                model = glm::translate(model, glm::vec3(197.0f, 0.0f, 1.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -455,7 +455,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f -197.0f, 0.0f, 151.0f-152.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -151.0f));
                 model = glm::scale(model, glm::vec3(198.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -464,7 +464,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f - 394.0f, 0.0f, 151.0f-0.0f));
+                model = glm::translate(model, glm::vec3(-197.0f, 0.0f,1.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -476,7 +476,7 @@ GLvoid drawScene()
             /*트랙3*/
             {
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f+2.0f, 0.0f, 151.0f-1.0f));
+                model = glm::translate(model, glm::vec3(199.0f, 0.0f, 0.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 152.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -485,7 +485,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f-197.0f, 0.0f, 151.0f - 154.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, - 153.0f));
                 model = glm::scale(model, glm::vec3(200.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -494,7 +494,7 @@ GLvoid drawScene()
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(394.0f - 396.0f, 0.0f, 151.0f - 1.0f));
+                model = glm::translate(model, glm::vec3(-199.0f, 0.0f, 0.0f));
                 model = glm::scale(model, glm::vec3(1.0f, 0.0f, 152.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
