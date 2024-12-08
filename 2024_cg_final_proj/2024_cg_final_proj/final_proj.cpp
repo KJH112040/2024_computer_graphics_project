@@ -267,7 +267,6 @@ void InitBuffer()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     //--- attribute 인덱스 1번을 사용 가능하게 함.
     glEnableVertexAttribArray(1);
-
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
@@ -303,6 +302,7 @@ GLvoid drawScene()
         glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
         vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0));
+        vTransform = glm::rotate(vTransform, glm::radians(player_robot.y_radian), glm::vec3(0.0, 1.0, 0.0));
         vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
         //vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
@@ -676,9 +676,17 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 GLvoid SpecialKeyBoard(int key, int x, int y) 
 {
     switch (key) {
+    case GLUT_KEY_UP:
+        player_robot.y_radian += 0.0f;
+        break;
+    case GLUT_KEY_DOWN:
+        player_robot.y_radian += 180.0f;
+        break;
     case GLUT_KEY_LEFT:
+        player_robot.y_radian += 90.0f;
         break;
     case GLUT_KEY_RIGHT:
+        player_robot.y_radian -= 90.0f;
         break;
     default:
         break;
