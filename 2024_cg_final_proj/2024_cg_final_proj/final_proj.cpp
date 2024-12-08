@@ -297,19 +297,18 @@ GLvoid drawScene()
 
         //뷰잉 변환
         glm::mat4 vTransform = glm::mat4(1.0f);
-        glm::vec3 cameraPos = glm::vec3(player_robot.x, 1.0f, player_robot.z + 1.0f); //--- 카메라 위치
+        glm::vec3 cameraPos = glm::vec3(player_robot.x - 1.0f * sin(glm::radians(player_robot.y_radian)), 1.0f, player_robot.z - 1.0f * cos(glm::radians(player_robot.y_radian))); //--- 카메라 위치
         glm::vec3 cameraDirection = glm::vec3(player_robot.x, 0.0f, player_robot.z); //--- 카메라 바라보는 방향
         glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
         vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0));
-        vTransform = glm::rotate(vTransform, glm::radians(player_robot.y_radian), glm::vec3(0.0, 1.0, 0.0));
         vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
         //vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
 
         //축
         glm::mat4 axisTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
-        axisTransForm = glm::rotate(axisTransForm, glm::radians(00.0f), glm::vec3(1.0, 0.0, 0.0));
+        axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0));
         axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
 
@@ -677,16 +676,24 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 {
     switch (key) {
     case GLUT_KEY_UP:
-        player_robot.y_radian += 0.0f;
+        player_robot.y_radian = 180.0f;
+        player_robot.shake_dir = 1;
+        player_robot.move = true;
         break;
     case GLUT_KEY_DOWN:
-        player_robot.y_radian += 180.0f;
+        player_robot.y_radian = 0.0f;
+        player_robot.shake_dir = 1;
+        player_robot.move = true;
         break;
     case GLUT_KEY_LEFT:
-        player_robot.y_radian += 90.0f;
+        player_robot.y_radian = -90.0f;
+        player_robot.shake_dir = 1;
+        player_robot.move = true;
         break;
     case GLUT_KEY_RIGHT:
-        player_robot.y_radian -= 90.0f;
+        player_robot.y_radian = 90.0f;
+        player_robot.shake_dir = 1;
+        player_robot.move = true;
         break;
     default:
         break;
@@ -702,15 +709,8 @@ GLvoid TimerFunc(int x)
         player_robot.shake += player_robot.shake_dir * 10 * player_robot.speed;
         if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
             player_robot.shake_dir *= -1;
-        if (player_robot.speed < 0.75f)
+        if (player_robot.speed < 0.45f)
             player_robot.speed += 0.01f;
-    }
-    /*정혜씨 이 switch 빼고 싶어요 이런 저의 맘 알아줄까요?*/
-    switch (x)
-    {
-    case 1:
-
-        break;
     }
     glutTimerFunc(10, TimerFunc, 1);
     glutPostRedisplay();
