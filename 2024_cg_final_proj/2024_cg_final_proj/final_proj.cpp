@@ -700,13 +700,15 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
         player_robot.move = true;
         break;
     case GLUT_KEY_LEFT:
-        player_robot.y_radian = -90.0f;
-        player_robot.shake_dir = 1;
+        player_robot.y_radian -= 1.0f;
+        if (player_robot.shake_dir == 0)
+            player_robot.shake_dir = 1;
         player_robot.move = true;
         break;
     case GLUT_KEY_RIGHT:
-        player_robot.y_radian = 90.0f;
-        player_robot.shake_dir = 1;
+        player_robot.y_radian += 1.0f;
+        if (player_robot.shake_dir == 0)
+            player_robot.shake_dir = 1;
         player_robot.move = true;
         break;
     default:
