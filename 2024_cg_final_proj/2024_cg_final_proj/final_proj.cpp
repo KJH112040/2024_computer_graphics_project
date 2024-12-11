@@ -16,7 +16,7 @@ struct Robot {
     GLfloat bb[2][3], //왼쪽 상단, 오른쪽 하단
         size, x, z,
         speed = 0.25f,
-        shake, y_radian, // shake = (발,다리)회전 각도, radian = 몸 y축 회전 각도
+        shake = 1, y_radian, // shake = (발,다리)회전 각도, radian = 몸 y축 회전 각도
         color[3];
     int shake_dir;
     bool move; // 움직이고 있는지(대기 후 이동)
@@ -269,8 +269,8 @@ void InitBuffer()
     glEnableVertexAttribArray(1);
 
     player_robot.move = false;
-    player_robot.y_radian = 180.0f;
-    player_robot.x = -300, player_robot.z = 200;
+    player_robot.y_radian = 180.0f, player_robot.move = true, player_robot.shake_dir = 1;
+    player_robot.x = -201, player_robot.z = 150;
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
@@ -549,7 +549,6 @@ GLvoid drawScene()
 
 		/*여기는 맵(바닥)*/
 		{
-
             /*트랙1*/
             {
                 glUniform3f(objColorLocation, 0.75, 0.75, 1.0);
@@ -667,6 +666,7 @@ GLvoid drawScene()
                 model = glm::scale(model, glm::vec3(0.02f, 1.0f, 0.02f));
 				model = glm::translate(model, glm::vec3(-player_robot.x, 1.0f, -player_robot.z));
                 model = glm::scale(model, glm::vec3(50.0f, 0.0f, 50.0f));
+                model = glm::rotate(model, glm::radians(player_robot.y_radian), glm::vec3(0.0, 1.0, 0.0));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -704,30 +704,18 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 {
     switch (key) {
     case GLUT_KEY_UP:
-        player_robot.y_radian = 180.0f;
-        if (player_robot.shake_dir == 0)
-            player_robot.shake_dir = 1;
-        player_robot.move = true;
+        if (player_robot.speed < 0.45f)
+            player_robot.speed += 0.01f;
         break;
     case GLUT_KEY_DOWN:
-        player_robot.y_radian = 0.0f;
-        if (player_robot.shake_dir == 0)
-            player_robot.shake_dir = 1;
-        player_robot.move = true;
+        if (player_robot.speed > 0.0f)
+            player_robot.speed -= 0.01f;
         break;
     case GLUT_KEY_LEFT:
-        player_robot.y_radian = -90.0f;
-        //player_robot.y_radian += 10.0f * player_robot.speed;
-        if (player_robot.shake_dir == 0)
-            player_robot.shake_dir = 1;
-        player_robot.move = true;
+        player_robot.y_radian += 20.0f * player_robot.speed;
         break;
     case GLUT_KEY_RIGHT:
-        player_robot.y_radian = 90.0f;
-        //player_robot.y_radian -= 10.0f * player_robot.speed;
-        if (player_robot.shake_dir == 0)
-            player_robot.shake_dir = 1;
-        player_robot.move = true;
+        player_robot.y_radian -= 20.0f * player_robot.speed;
         break;
     default:
         break;
@@ -743,8 +731,8 @@ GLvoid TimerFunc(int x)
         player_robot.shake += player_robot.shake_dir * 10 * player_robot.speed;
         if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
             player_robot.shake_dir *= -1;
-        if (player_robot.speed < 0.45f)
-            player_robot.speed += 0.01f;
+        if (player_robot.speed < 0.05f)
+            player_robot.speed += 0.001f;
     }
     glutTimerFunc(10, TimerFunc, 1);
     glutPostRedisplay();
