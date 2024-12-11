@@ -3,12 +3,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-//#include <gl/glm/glm.hpp>
-//#include <gl/glm/ext.hpp>
-//#include <gl/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm/glm.hpp>
+//#include <gl/glm/glm/ext.hpp>
+//#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
@@ -269,8 +269,8 @@ void InitBuffer()
     glEnableVertexAttribArray(1);
 
     player_robot.move = false;
-    player_robot.y_radian = 180.0f, player_robot.move = true, player_robot.shake_dir = 1;
-    player_robot.x = -201, player_robot.z = 150;
+    player_robot.y_radian = 0.0f;//180.0f, player_robot.move = true, player_robot.shake_dir = 1;
+    player_robot.x = -1*-201, player_robot.z = 150;
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
@@ -502,6 +502,42 @@ GLvoid drawScene()
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+            }
+        }
+
+        /*골대*/
+        {
+            /*기둥1*/
+            {
+                glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
+                glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+                model = glm::translate(model, glm::vec3(203.9f,2.0f,150.9f));
+                model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+                model = axisTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24);
+            }
+
+            /*기둥2*/
+            {
+                glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
+                glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+                model = glm::translate(model, glm::vec3(198.1f, 2.0f, 150.9f));
+                model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+                model = axisTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24);
+            }
+
+            /*깃발*/
+            {
+                glUniform3f(objColorLocation, 1.f, 1.f, 1.f);
+                glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+                model = glm::translate(model, glm::vec3(201.f, 3.2f, 149.9f));
+                model = glm::scale(model, glm::vec3(3.0f, 0.8f, 1.f));
+                model = axisTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 4);
             }
         }
     }
