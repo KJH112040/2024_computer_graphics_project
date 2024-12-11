@@ -267,6 +267,10 @@ void InitBuffer()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     //--- attribute 인덱스 1번을 사용 가능하게 함.
     glEnableVertexAttribArray(1);
+
+    player_robot.move = false;
+    player_robot.y_radian = 180.0f;
+    player_robot.x = -300, player_robot.z = 200;
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
@@ -415,91 +419,88 @@ GLvoid drawScene()
         {
             /*트랙1*/
             {
+                glUniform3f(objColorLocation, 0.75, 0.75, 1.0);
+
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(195.0f, 0.0f, 1.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
+                model = glm::translate(model, glm::vec3(200.0f + 1.0f - 2.0f, 0.0f, 1.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.75, 0.75, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -149.0f));
-                model = glm::scale(model, glm::vec3(194.0f, 0.0f, 1.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f + 2.0f));
+                model = glm::scale(model, glm::vec3(200.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.75, 0.75, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(-195.0f, 0.0f, 1.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
+                model = glm::translate(model, glm::vec3(-200.0f - 1.0f + 2.0f, 0.0f, 1.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.75, 0.75, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
             }
 
             /*트랙2*/
             {
+                glUniform3f(objColorLocation, 0.5, 0.5, 1.0);
+
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(197.0f, 0.0f, 1.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
+                model = glm::translate(model, glm::vec3(200.0f + 1.0f, 0.0f, 0.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.5, 0.5, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -151.0f));
-                model = glm::scale(model, glm::vec3(198.0f, 0.0f, 1.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f));
+                model = glm::scale(model, glm::vec3(200.0f + 1.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.5, 0.5, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(-197.0f, 0.0f,1.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 151.0f));
+                model = glm::translate(model, glm::vec3(-200.0f - 1.0f, 0.0f, 0.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.5, 0.5, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
             }
 
             /*트랙3*/
             {
+                glUniform3f(objColorLocation, 0.25, 0.25, 1.0);
+
                 glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(199.0f, 0.0f, 0.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 152.0f));
+                model = glm::translate(model, glm::vec3(200.0f + 1.0f + 2.0f, 0.0f, -1.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.25, 0.25, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(0.0f, 0.0f, - 153.0f));
-                model = glm::scale(model, glm::vec3(200.0f, 0.0f, 1.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f - 2.0f));
+                model = glm::scale(model, glm::vec3(200.0f + 1.0f + 1.0f, 0.0f, 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.25, 0.25, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
                 model = glm::mat4(1.0f);//변환 행렬 생성 T
-                model = glm::translate(model, glm::vec3(-199.0f, 0.0f, 0.0f));
-                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 152.0f));
+                model = glm::translate(model, glm::vec3(-200.0f - 1.0f - 2.0f, 0.0f, -1.0f));
+                model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
                 model = axisTransForm * model;
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-                glUniform3f(objColorLocation, 0.25, 0.25, 1.0);
                 glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
             }
         }
@@ -535,6 +536,7 @@ GLvoid drawScene()
 
 		//축
 		glm::mat4 axisTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
+        axisTransForm = glm::rotate(axisTransForm, glm::radians(player_robot.y_radian - 180.0f), glm::vec3(0.0, 0.0, 1.0));
 		axisTransForm = glm::translate(axisTransForm, glm::vec3(0.0f, 0.0f, 2.0f));
 		axisTransForm = glm::rotate(axisTransForm, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
@@ -703,22 +705,26 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
     switch (key) {
     case GLUT_KEY_UP:
         player_robot.y_radian = 180.0f;
-        player_robot.shake_dir = 1;
+        if (player_robot.shake_dir == 0)
+            player_robot.shake_dir = 1;
         player_robot.move = true;
         break;
     case GLUT_KEY_DOWN:
         player_robot.y_radian = 0.0f;
-        player_robot.shake_dir = 1;
+        if (player_robot.shake_dir == 0)
+            player_robot.shake_dir = 1;
         player_robot.move = true;
         break;
     case GLUT_KEY_LEFT:
-        player_robot.y_radian -= 1.0f;
+        player_robot.y_radian = -90.0f;
+        //player_robot.y_radian += 10.0f * player_robot.speed;
         if (player_robot.shake_dir == 0)
             player_robot.shake_dir = 1;
         player_robot.move = true;
         break;
     case GLUT_KEY_RIGHT:
-        player_robot.y_radian += 1.0f;
+        player_robot.y_radian = 90.0f;
+        //player_robot.y_radian -= 10.0f * player_robot.speed;
         if (player_robot.shake_dir == 0)
             player_robot.shake_dir = 1;
         player_robot.move = true;
