@@ -2,23 +2,23 @@
 #include <iostream>
 #include <gl/glew.h>
 #include <gl/freeglut.h>
-#include <gl/freeglut_ext.h>
+#include <gl/freeglut_ext.h>/*
 #include <gl/glm/glm.hpp>
 #include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
-//#include <gl/glm/glm/glm.hpp>
-//#include <gl/glm/glm/ext.hpp>
-//#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>*/
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
 struct Robot {
     GLfloat bb[2][3], //¿ÞÂÊ »ó´Ü, ¿À¸¥ÂÊ ÇÏ´Ü
-        size, x, z,
-        speed = 0.25f,
+        size, x, z, road[2][2],
+        speed = 0.0f,
         shake = 1, y_radian, // shake = (¹ß,´Ù¸®)È¸Àü °¢µµ, radian = ¸ö yÃà È¸Àü °¢µµ
-        color[3];
-    int shake_dir;
+        color[3] = {};
+    int shake_dir, dir;
     bool move; // ¿òÁ÷ÀÌ°í ÀÖ´ÂÁö(´ë±â ÈÄ ÀÌµ¿)
 };
 Robot player_robot, block_robot[9];
@@ -139,6 +139,57 @@ float vertexNormal[] = {
      0.0f, 1.0f, 0.0f,
      0.0f, 1.0f, 0.0f
 };//Á¤À°¸éÃ¼, Ãà,Á¤»ç¸éÃ¼ »ö±òµé
+float vertexTexture[] = {
+    //¾Õ¸é
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    //À­¸é
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    //¿Þ¸é
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    //µÞ¸é
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    //¾Æ·¡
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    //¿À¸¥ÂÊ
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+     //¼±
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+
+    //¾Æ·¡
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+};//Á¤À°¸éÃ¼, Ãà,Á¤»ç¸éÃ¼ »ö±òµé
 
 GLchar* vertexSource, * fragmentSource;
 GLuint shaderID;
@@ -241,11 +292,11 @@ GLuint make_shaderProgram()
 
     return ShaderProgramID;
 }
-GLuint VAO, VBO[2];
+GLuint VAO, VBO[3];
 void InitBuffer()
 {
     glGenVertexArrays(1, &VAO); //--- VAO ¸¦ ÁöÁ¤ÇÏ°í ÇÒ´çÇÏ±â
-    glGenBuffers(2, VBO); //--- 2°³ÀÇ VBO¸¦ ÁöÁ¤ÇÏ°í ÇÒ´çÇÏ±â
+    glGenBuffers(3, VBO); //--- 2°³ÀÇ VBO¸¦ ÁöÁ¤ÇÏ°í ÇÒ´çÇÏ±â
 
     glBindVertexArray(VAO); //--- VAO¸¦ ¹ÙÀÎµåÇÏ±â
     //--- 1¹øÂ° VBO¸¦ È°¼ºÈ­ÇÏ¿© ¹ÙÀÎµåÇÏ°í, ¹öÅØ½º ¼Ó¼º (ÁÂÇ¥°ª)À» ÀúÀå
@@ -253,11 +304,11 @@ void InitBuffer()
     //--- º¯¼ö diamond ¿¡¼­ ¹öÅØ½º µ¥ÀÌÅÍ °ªÀ» ¹öÆÛ¿¡ º¹»çÇÑ´Ù.
     //--- triShape ¹è¿­ÀÇ »çÀÌÁî: 9 * float
     glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(vertexPosition), vertexPosition, GL_STATIC_DRAW);
-
     //--- ÁÂÇ¥°ªÀ» attribute ÀÎµ¦½º 0¹ø¿¡ ¸í½ÃÇÑ´Ù: ¹öÅØ½º ´ç 3* float
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     //--- attribute ÀÎµ¦½º 0¹øÀ» »ç¿ë°¡´ÉÇÏ°Ô ÇÔ
     glEnableVertexAttribArray(0);
+
     //--- 2¹øÂ° VBO¸¦ È°¼ºÈ­ ÇÏ¿© ¹ÙÀÎµå ÇÏ°í, ¹öÅØ½º ¼Ó¼º (»ö»ó)À» ÀúÀå
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
     //--- º¯¼ö colors¿¡¼­ ¹öÅØ½º »ö»óÀ» º¹»çÇÑ´Ù.
@@ -268,9 +319,42 @@ void InitBuffer()
     //--- attribute ÀÎµ¦½º 1¹øÀ» »ç¿ë °¡´ÉÇÏ°Ô ÇÔ.
     glEnableVertexAttribArray(1);
 
+    //--- 2¹øÂ° VBO¸¦ È°¼ºÈ­ ÇÏ¿© ¹ÙÀÎµå ÇÏ°í, ¹öÅØ½º ¼Ó¼º (»ö»ó)À» ÀúÀå
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+    //--- º¯¼ö colors¿¡¼­ ¹öÅØ½º »ö»óÀ» º¹»çÇÑ´Ù.
+    //--- colors ¹è¿­ÀÇ »çÀÌÁî: 9 *float 
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertexTexture), vertexTexture, GL_STATIC_DRAW);
+    //--- »ö»ó°ªÀ» attribute ÀÎµ¦½º 1¹ø¿¡ ¸í½ÃÇÑ´Ù: ¹öÅØ½º ´ç 3*float
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    //--- attribute ÀÎµ¦½º 1¹øÀ» »ç¿ë °¡´ÉÇÏ°Ô ÇÔ.
+    glEnableVertexAttribArray(2);
+
     player_robot.move = false;
-    player_robot.y_radian = 0.0f;//180.0f, player_robot.move = true, player_robot.shake_dir = 1;
-    player_robot.x = -1*-201, player_robot.z = 150;
+    player_robot.y_radian = 180.0f, /*player_robot.move = true, */player_robot.shake_dir = 1;
+    player_robot.x = -201, player_robot.z = 150;
+    {
+        block_robot[0].road[0][0] = -203, block_robot[0].road[0][1] = 150;
+        block_robot[0].road[1][0] = -203, block_robot[0].road[1][1] = -150;
+
+        block_robot[1].road[0][0] = -199, block_robot[1].road[0][1] = 149;
+        block_robot[1].road[1][0] = -199, block_robot[1].road[1][1] = -149;
+
+        block_robot[2].road[0][0] = -203, block_robot[2].road[0][1] = -150;
+        block_robot[2].road[1][0] = -203, block_robot[2].road[1][1] = 150;
+    }
+    for (int i = 0; i < 9; ++i) {
+        block_robot[i].x = block_robot[i].road[0][0];
+        block_robot[i].z = block_robot[i].road[0][1];
+        block_robot[i].speed = 0.25f, block_robot[i].shake_dir = 1;
+        if (block_robot[i].road[0][0] < block_robot[i].road[1][0])
+            block_robot[i].y_radian = 90.0f;
+        if (block_robot[i].road[0][0] > block_robot[i].road[1][0])
+            block_robot[i].y_radian = -90.0f;
+        if (block_robot[i].road[0][1] < block_robot[i].road[1][1])
+            block_robot[i].y_radian = 0.0f;
+        if (block_robot[i].road[0][1] > block_robot[i].road[1][1])
+            block_robot[i].y_radian = 180.0f;
+    }
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
@@ -393,13 +477,62 @@ GLvoid drawScene()
 
         /*ÀÌ°Ç Àå¾Ö¹° ·Îº¿*/
         for (int i = 0; i < 9; ++i) {
-            glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
-            model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = axisTransForm * model;
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-            glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
-            //glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            glUniform3f(objColorLocation, block_robot[i].color[0], block_robot[i].color[1], block_robot[i].color[2]);
+            glm::mat4 shapeTransForm = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+            shapeTransForm = glm::translate(shapeTransForm, glm::vec3(block_robot[i].x, 0.0f, block_robot[i].z));      //robotÀ§Ä¡
+            shapeTransForm = glm::rotate(shapeTransForm, glm::radians(block_robot[i].y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //º¸´Â ¹æÇâ
+            shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
+            /*¿À¸¥´Ù¸®*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                                //¸ö À§Ä¡¿¡ µû¶ó Á¶Á¤
+                model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                  //´Ù¸® Èçµé±â
+                model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //¿øÁ¡Á¶Á¤
+                model = glm::scale(model, glm::vec3(0.05, 0.1, 0.05));                                                                      //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /*¿Þ´Ù¸®*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                               //¸ö À§Ä¡¿¡ µû¶ó Á¶Á¤
+                model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                 //´Ù¸® Èçµé±â
+                model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //¿øÁ¡Á¶Á¤
+                model = glm::scale(model, glm::vec3(0.05, 0.1, 0.05));                                                                      //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /* ¸öÅë */ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(0.0f, 0.35f, 0.0f));
+                model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));                                                                      //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /*¿À¸¥ÆÈ*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
+                model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+                model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+                model = glm::scale(model, glm::vec3(0.025, 0.13, 0.05));                                                                    //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /*¿Þ  ÆÈ*/ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
+                model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+                model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+                model = glm::scale(model, glm::vec3(0.025, 0.13, 0.05));                                                                    //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            } /* ¸Ó¸® */ {
+                glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
+                model = glm::translate(model, glm::vec3(0.0f, 0.55f, 0.0f));
+                model = glm::scale(model, glm::vec3(0.05, 0.05, 0.05));                                                                       //size
+                model = axisTransForm * shapeTransForm * model;
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
+            }
         }
 
         /*ÀÌ°Ç ÀÏ´Ü Ãà*/
@@ -557,8 +690,8 @@ GLvoid drawScene()
 		// Åõ¿µ
 		glm::mat4 kTransform = glm::mat4(1.0f);
 		kTransform = glm::ortho(-7.0f, 7.0f, -7.0f, 7.0f, -5.0f, 5.0f);
-		//        kTransform = glm::perspective(glm::radians(75.0f), 0.75f, 9.1f, 11.0f);
-		//        kTransform = glm::translate(kTransform, glm::vec3(0.0, 0.0, -9.0f));
+		//kTransform = glm::perspective(glm::radians(75.0f), 0.75f, 9.1f, 11.0f);
+		//kTransform = glm::translate(kTransform, glm::vec3(0.0, 0.0, -9.0f));
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
 		//ºäÀ× º¯È¯
@@ -711,7 +844,6 @@ GLvoid drawScene()
 		}
 	}
 
-
     glutSwapBuffers();
 }
 GLvoid Reshape(int w, int h)
@@ -740,18 +872,18 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 {
     switch (key) {
     case GLUT_KEY_UP:
-        if (player_robot.speed < 0.45f)
-            player_robot.speed += 0.01f;
+        if (player_robot.speed < 0.05f)
+            player_robot.speed += 0.001f;
         break;
     case GLUT_KEY_DOWN:
         if (player_robot.speed > 0.0f)
             player_robot.speed -= 0.01f;
         break;
     case GLUT_KEY_LEFT:
-        player_robot.y_radian += 20.0f * player_robot.speed;
+        player_robot.y_radian += 45.0f;
         break;
     case GLUT_KEY_RIGHT:
-        player_robot.y_radian -= 20.0f * player_robot.speed;
+        player_robot.y_radian -= 45.0f;
         break;
     default:
         break;
@@ -764,11 +896,24 @@ GLvoid TimerFunc(int x)
     if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
         player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
         player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
-        player_robot.shake += player_robot.shake_dir * 10 * player_robot.speed;
+        player_robot.shake += player_robot.shake_dir * 20 * player_robot.speed;
         if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
             player_robot.shake_dir *= -1;
-        if (player_robot.speed < 0.05f)
+        if (player_robot.speed < 0.25f)
             player_robot.speed += 0.001f;
+    }
+    for (int i = 0; i < 9; ++i) {
+        block_robot[i].x += sin(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+        block_robot[i].z += cos(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+        block_robot[i].shake += block_robot[i].shake_dir * 20 * block_robot[i].speed;
+        if (block_robot[i].shake <= -60.0f || block_robot[i].shake >= 60.0f)
+            block_robot[i].shake_dir *= -1;
+        if ((block_robot[i].road[0][0] < block_robot[i].x and block_robot[i].x < block_robot[i].road[1][0]) ||
+            (block_robot[i].road[0][0] > block_robot[i].x and block_robot[i].x > block_robot[i].road[1][0]) ||
+            (block_robot[i].road[0][1] < block_robot[i].z and block_robot[i].z < block_robot[i].road[1][1]) ||
+            (block_robot[i].road[0][1] > block_robot[i].z and block_robot[i].z > block_robot[i].road[1][1]));
+        else
+            block_robot[i].y_radian += 180.0f;
     }
     glutTimerFunc(10, TimerFunc, 1);
     glutPostRedisplay();
