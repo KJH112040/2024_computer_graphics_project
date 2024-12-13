@@ -10,6 +10,7 @@
 //#include <gl/glm/glm/ext.hpp>
 //#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
+#include <ctime>
 
 typedef struct Bounding_Box {
 	GLfloat x1, z1, x2, z2;
@@ -350,6 +351,7 @@ GLuint make_shaderProgram()
 	return ShaderProgramID;
 }
 GLuint VAO, VBO[3];
+time_t start_time, finish_time;
 void InitBuffer()
 {
 	glGenVertexArrays(1, &VAO); //--- VAO 를 지정하고 할당하기
@@ -413,6 +415,7 @@ void InitBuffer()
 			block_robot[i].y_radian = 180.0f;
 	}
 	player_robot.bb = get_bb(player_robot);
+	start_time = time(NULL);
 }
 void InitTextures() 
 {
@@ -1407,9 +1410,11 @@ GLvoid TimerFunc(int x)
 			player_robot.speed += 0.001f;
 
 		if (collision(goal, player_robot.bb)) {
+			finish_time = time(NULL);
 			player_robot.x = 0.f, player_robot.z = 0.f, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
 			player_robot.move = false;
 			end = true;
+			std::cout << (double)(finish_time - start_time) << '\n';
 		}
 	}
 	if (player_robot.y < 0) {
