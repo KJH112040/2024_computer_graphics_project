@@ -674,6 +674,19 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 0, 4);
 			}
 		}
+
+		/*Start 지점*/
+		{
+			glUniform3f(objColorLocation, 1.f, 1.f, 1.0f);
+
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::translate(model, glm::vec3(-201.0f, 0.0001f, 150.0f));
+			model = glm::scale(model, glm::vec3(3.0f, 0.0f, 1.0f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+		}
 	}
 	//미니 맵===================================================================================================================================================================================
 	if (1) {
