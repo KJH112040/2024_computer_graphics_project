@@ -19,7 +19,8 @@ struct Robot {
 	GLfloat size{}, x{}, z{}, road[2][2]{},
 		speed = 0.0f,
 		shake = 1, y_radian = 180.0f, // shake = (¹ß,´Ù¸®)È¸Àü °¢µµ, radian = ¸ö yÃà È¸Àü °¢µµ
-		color[3] = {};
+		color[3] = {},
+		y{};
 	BB bb{}; //¿ÞÂÊ »ó´Ü, ¿À¸¥ÂÊ ÇÏ´Ü
 	int shake_dir{}, dir{};
 	bool move = false; // ¿òÁ÷ÀÌ°í ÀÖ´ÂÁö(´ë±â ÈÄ ÀÌµ¿)
@@ -332,8 +333,8 @@ void InitBuffer()
 	glEnableVertexAttribArray(2);
 
 	player_robot.move = false;
-	player_robot.y_radian = 180.0f, /*player_robot.move = true, */player_robot.shake_dir = 1;
-	player_robot.x = -201, player_robot.z = 150;
+	player_robot.y_radian = 180.0f, player_robot.shake_dir = 1;
+	player_robot.x = -201, player_robot.z = 150, player_robot.y=0.f;
 	{
 		block_robot[0].road[0][0] = -203, block_robot[0].road[0][1] = 150;
 		block_robot[0].road[1][0] = -203, block_robot[0].road[1][1] = -150;
@@ -421,7 +422,7 @@ GLvoid drawScene()
 		{
 			glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
 			glm::mat4 shapeTransForm = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
-			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, 0.0f, player_robot.z));      //robotÀ§Ä¡
+			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, player_robot.y, player_robot.z));      //robotÀ§Ä¡
 			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //º¸´Â ¹æÇâ
 			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
 			/*¿À¸¥´Ù¸®*/ {
@@ -857,7 +858,6 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'm':
-		player_robot.y_radian = 180.0f;
 		player_robot.move = true;
 		player_robot.shake_dir = 1;
 		break;
@@ -896,14 +896,31 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 GLvoid TimerFunc(int x)
 {
 	if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
-		player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
-		player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+		if(collision(map_bb,get_bb(player_robot)) || collision(map_bb2, get_bb(player_robot))|| collision(map_bb3, get_bb(player_robot))){
+			player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
+			player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+		}
+		else {
+			player_robot.y -= 0.1f;
+			player_robot.speed = 0.0f;
+			player_robot.move = false;
+		}
 		player_robot.shake += player_robot.shake_dir * 20 * player_robot.speed;
 		if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
 			player_robot.shake_dir *= -1;
 		if (player_robot.speed < 0.25f)
 			player_robot.speed += 0.001f;
 	}
+	if (player_robot.y < 0) {
+		player_robot.y -= player_robot.speed;
+		player_robot.speed += 0.01f;
+
+		if (player_robot.y < -5.f) {
+			player_robot.y_radian = 180.0f, player_robot.shake_dir = 1;
+			player_robot.x = -201, player_robot.z = 150, player_robot.y = 0.f;
+		}
+	}
+
 	for (int i = 0; i < 9; ++i) {
 		block_robot[i].x += sin(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
 		block_robot[i].z += cos(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
@@ -917,6 +934,7 @@ GLvoid TimerFunc(int x)
 		else
 			block_robot[i].y_radian += 180.0f;
 	}
+
 	glutTimerFunc(10, TimerFunc, 1);
 	glutPostRedisplay();
 }
