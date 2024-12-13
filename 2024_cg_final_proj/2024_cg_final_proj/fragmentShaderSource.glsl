@@ -1,11 +1,17 @@
 #version 330
 in vec3 FragPos; //--- 위치값
 in vec3 Normal; //--- 버텍스 세이더에서 받은 노멀값
+in vec2 out_TexCoord;
 out vec4 FragColor; //--- 최종 객체의 색 저장
 
 uniform sampler2D outTexture1;
-//uniform sampler2D outTexture2;
+uniform sampler2D outTexture2;
+uniform sampler2D outTexture3;
+uniform sampler2D outTexture4;
+uniform sampler2D outTexture5;
+uniform sampler2D outTexture6;
 
+uniform int index;
 uniform vec3 objectColor;
 uniform vec3 lightPos; //--- 조명의 위치
 uniform vec3 lightColor; //--- 응용 프로그램에서 설정한 조명 색상
@@ -23,6 +29,12 @@ void main(void)
 //	vec3 result = (ambient + diffuse) * objectColor; //--- 최종 조명 설정된 픽셀 색상: (주변+산란반사+거울반사조명)*객체 색상
 //
 //	FragColor = vec4 (result, 1.0);
-	FragColor = vec4 (objectColor, 1.0);
-	//FragColor = vec4 (objectColor, 1.0) * texture (outTexture1, out_TexCoord);
+	switch(index){
+	case 0:
+		FragColor = vec4 (objectColor, 1.0);
+		break;
+	case 1:
+		FragColor = texture (outTexture1, out_TexCoord) + texture (outTexture2, out_TexCoord) + texture (outTexture3, out_TexCoord) + texture (outTexture4, out_TexCoord) + texture (outTexture5, out_TexCoord) + texture (outTexture6, out_TexCoord);
+		break;
+	}
 }

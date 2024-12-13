@@ -243,7 +243,7 @@ float vertexTexture[] = {
    1.0f, 1.0f,
    1.0f, 0.0f,
    0.0f, 0.0f,
-   0.0f, 1.0f,
+   0.0f, 1.0f
 };//정육면체, 축,정사면체 색깔들
 
 GLchar* vertexSource, * fragmentSource;
@@ -251,6 +251,7 @@ GLuint shaderID;
 GLuint vertexShader;
 GLuint fragmentShader;
 unsigned int texture_index[6];
+BITMAPINFO* bmp;
 
 int main(int argc, char** argv)
 {
@@ -275,6 +276,7 @@ int main(int argc, char** argv)
 	make_fragmentShaders();
 	shaderID = make_shaderProgram();
 	InitBuffer();
+	InitTextures();
 	glutKeyboardFunc(KeyBoard);
 	glutSpecialFunc(SpecialKeyBoard);
 	glutTimerFunc(10, TimerFunc, 1);
@@ -358,7 +360,7 @@ void InitBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
 	//--- triShape 배열의 사이즈: 9 * float
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(vertexPosition), vertexPosition, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPosition), vertexPosition, GL_STATIC_DRAW);
 	//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	//--- attribute 인덱스 0번을 사용가능하게 함
@@ -368,7 +370,7 @@ void InitBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	//--- 변수 colors에서 버텍스 색상을 복사한다.
 	//--- colors 배열의 사이즈: 9 *float 
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(vertexNormal), vertexNormal, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexNormal), vertexNormal, GL_STATIC_DRAW);
 	//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	//--- attribute 인덱스 1번을 사용 가능하게 함.
@@ -378,9 +380,9 @@ void InitBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	//--- 변수 colors에서 버텍스 색상을 복사한다.
 	//--- colors 배열의 사이즈: 9 *float 
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertexTexture), vertexTexture, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexTexture), vertexTexture, GL_STATIC_DRAW);
 	//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	//--- attribute 인덱스 1번을 사용 가능하게 함.
 	glEnableVertexAttribArray(2);
 
@@ -414,7 +416,6 @@ void InitBuffer()
 }
 void InitTextures() 
 {
-	BITMAPINFO* bmp;
 	glGenTextures(6, texture_index);
 	glUseProgram(shaderID);
 
@@ -426,8 +427,63 @@ void InitTextures()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//unsigned char* data1 = LoadDIBitmap("front.bmp", &bmp);
-	//glTexImage2D(GL_TEXTURE_2D, 0, 3, 1000, 1000, 0, GL_BGR, GL_UNSIGNED_BYTE, data1);
+	unsigned char* data1 = LoadDIBitmap("front.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data1);
+
+	//--- texture[1]
+	int tLocation2 = glGetUniformLocation(shaderID, "outTexture2"); //--- outTexture2 유니폼 샘플러의 위치를 가져옴
+	glUniform1i(tLocation2, 1);
+	glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data2 = LoadDIBitmap("up.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data2);
+
+	//--- texture[2]
+	int tLocation3 = glGetUniformLocation(shaderID, "outTexture3"); //--- outTexture3 유니폼 샘플러의 위치를 가져옴
+	glUniform1i(tLocation3, 2);
+	glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data3 = LoadDIBitmap("left.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data3);
+
+	//--- texture[3]
+	int tLocation4 = glGetUniformLocation(shaderID, "outTexture4"); //--- outTexture4 유니폼 샘플러의 위치를 가져옴
+	glUniform1i(tLocation4, 3);
+	glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data4 = LoadDIBitmap("back.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data4);
+
+	//--- texture[4]
+	int tLocation5 = glGetUniformLocation(shaderID, "outTexture5"); //--- outTexture5 유니폼 샘플러의 위치를 가져옴
+	glUniform1i(tLocation5, 4);
+	glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data5 = LoadDIBitmap("bottom.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data5);
+
+	//--- texture[5]
+	int tLocation6 = glGetUniformLocation(shaderID, "outTexture6"); //--- outTexture6 유니폼 샘플러의 위치를 가져옴
+	glUniform1i(tLocation6, 5);
+	glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data6 = LoadDIBitmap("right.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data6);
 }
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f };
@@ -473,6 +529,7 @@ GLvoid drawScene()
 		axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
 
+		unsigned int indexLocation = glGetUniformLocation(shaderID, "index"); //--- object Color값 전달
 		unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
 		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
 		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
@@ -484,8 +541,7 @@ GLvoid drawScene()
 		//오브젝트 색 지정
 		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
 
-		//glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
-		//glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+		glUniform1i(indexLocation, 0);
 
 		/*여기에 로봇*/
 		{
@@ -743,35 +799,62 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 0, 4);
 			}
 		}
-
 		/*Start 지점*/
 		{
-			glUniform3f(objColorLocation, 1.f, 1.f, 1.0f);
+			glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
 
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::translate(model, glm::vec3(-201.0f, 0.0001f, 150.0f));
-			model = glm::scale(model, glm::vec3(3.0f, 0.0f, 1.0f));
+			model = glm::translate(model, glm::vec3(-201.0f, 0.5f, 149.0f));
+			model = glm::scale(model, glm::vec3(3.0f, 0.0f, 0.1f));
 			model = axisTransForm * model;
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 			glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 		}
+		/*큐브맵*/
+		{
+			glUniform1i(indexLocation, 1);
+			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::scale(model, glm::vec3(250.0f, 10.0f, 200.0f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+			glDrawArrays(GL_QUADS, 4, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+			glDrawArrays(GL_QUADS, 8, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+			glDrawArrays(GL_QUADS, 12, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+			glDrawArrays(GL_QUADS, 16, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+			glDrawArrays(GL_QUADS, 20, 4); //사각형 크기 1.0 x 0.0 x 1.0
+		}
 	}
 	//미니 맵===================================================================================================================================================================================
-	{
-		glViewport(3 * background_width / 4, 3 * background_height / 4, background_width / 4, background_height / 4); /*대충 오른쪽상단 어딘가에 배치 바라요*/
+	if(1)  {
+		glViewport(0 * background_width / 4, 3 * background_height / 4, background_width / 4, background_height / 4); /*대충 오른쪽상단 어딘가에 배치 바라요*/
 
 		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
 		unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
 		unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
 
+		unsigned int indexLocation = glGetUniformLocation(shaderID, "index"); //--- object Color값 전달
 		unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
 		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
 		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
 
 		// 투영
 		glm::mat4 kTransform = glm::mat4(1.0f);
-		kTransform = glm::ortho(-7.5f, 7.5f, -8.0f, 8.0f, -5.0f, 5.0f);
+		kTransform = glm::ortho(-8.5f, 8.5f, -8.0f, 8.0f, -5.0f, 5.0f);
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
 		//뷰잉 변환
@@ -794,13 +877,14 @@ GLvoid drawScene()
 		glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 
 		//오브젝트 색 지정
+		glUniform1i(indexLocation, 0);
 		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
 
 		/*여기는 맵(바닥)*/
 		{
 			/*트랙1*/
 			{
-				glUniform3f(objColorLocation, 0.75f, 0.75f, 1.0f);
+				glUniform3f(objColorLocation, 0.75f, 0.75f, 0.75f);
 
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -832,7 +916,7 @@ GLvoid drawScene()
 
 			/*트랙2*/
 			{
-				glUniform3f(objColorLocation, 0.5f, 0.5f, 1.0f);
+				glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
 
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -864,7 +948,7 @@ GLvoid drawScene()
 
 			/*트랙3*/
 			{
-				glUniform3f(objColorLocation, 0.25f, 0.25f, 1.0f);
+				glUniform3f(objColorLocation, 0.25f, 0.25f, 0.25f);
 
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -894,24 +978,12 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 			}
 		}
-		/*경계*/
-		{
-			glUniform3f(objColorLocation, 0.0f, 0.0f, 0.0f);
-
-			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
-			model = axisTransForm * model;
-			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-			glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-		}
 		/*플레이어*/
 		{
-			glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
+			glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
 
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::scale(model, glm::vec3(0.02f, 1.0f, 0.02f));
+			model = glm::scale(model, glm::vec3(0.022f, 1.0f, 0.02f));
 			model = glm::translate(model, glm::vec3(-player_robot.x, 1.0f, -player_robot.z));
 			model = glm::scale(model, glm::vec3(50.0f, 0.0f, 50.0f));
 			model = glm::rotate(model, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1002,6 +1074,8 @@ GLvoid TimerFunc(int x)
 		if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
 			player_robot.speed = 0;
 			player_robot.move = false;
+			player_robot.x -= sin(glm::radians(player_robot.y_radian)) * 0.01f;
+			player_robot.z -= cos(glm::radians(player_robot.y_radian)) * 0.01f;
 			player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
 			player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
 			glutTimerFunc(10, Bump, i);
@@ -1023,6 +1097,8 @@ GLvoid TimerFunc(int x)
 			if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
 				player_robot.speed = 0;
 				player_robot.move = false;
+				player_robot.x -= sin(glm::radians(player_robot.y_radian)) * 0.01f;
+				player_robot.z -= cos(glm::radians(player_robot.y_radian)) * 0.01f;
 				player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
 				player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
 				glutTimerFunc(10, Bump, i);
