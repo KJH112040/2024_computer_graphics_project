@@ -487,6 +487,7 @@ void InitTextures()
 }
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f }, goal{198.f,149.f,204.f,151.f};
+bool end = false;
 
 GLvoid drawScene()
 {
@@ -499,7 +500,7 @@ GLvoid drawScene()
 	glEnable(GL_DEPTH_TEST);
 
 	//그냥 맵===================================================================================================================================================================================
-	{
+	if(!end){
 		glViewport(0, 0, background_width, background_height);
 
 		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
@@ -840,7 +841,7 @@ GLvoid drawScene()
 		}
 	}
 	//미니 맵===================================================================================================================================================================================
-	if(1)  {
+	if(!end)  {
 		glViewport(0 * background_width / 4, 3 * background_height / 4, background_width / 4, background_height / 4); /*대충 오른쪽상단 어딘가에 배치 바라요*/
 
 		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
@@ -994,6 +995,349 @@ GLvoid drawScene()
 		}
 	}
 
+	if (end) {
+
+		glViewport(0, 0, background_width, background_height);
+
+		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
+		unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
+		unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
+
+		//원근 투영
+		glm::mat4 kTransform = glm::mat4(1.0f);
+		kTransform = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 50.0f);
+		kTransform = glm::translate(kTransform, glm::vec3(0.0f, 0.0f, -8.0f));
+		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
+
+		//뷰잉 변환
+		glm::mat4 vTransform = glm::mat4(1.0f);
+		glm::vec3 cameraPos = glm::vec3(player_robot.x - 1.0f * sin(glm::radians(player_robot.y_radian)), 1.0f, player_robot.z - 1.0f * cos(glm::radians(player_robot.y_radian))); //--- 카메라 위치
+		glm::vec3 cameraDirection = glm::vec3(player_robot.x, 0.0f, player_robot.z); //--- 카메라 바라보는 방향
+		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
+
+		vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+		//vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
+		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
+
+		//축
+		glm::mat4 axisTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
+		axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
+
+		unsigned int indexLocation = glGetUniformLocation(shaderID, "index"); //--- object Color값 전달
+		unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
+		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
+		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
+
+		//조명 위치 및 색
+		glUniform3f(lightPosLocation, 0.0f, 3.0f, 0.0f);
+		glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
+
+		//오브젝트 색 지정
+		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
+
+		glUniform1i(indexLocation, 0);
+
+		/*여기에 로봇*/
+		{
+			glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
+			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
+			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, player_robot.y, player_robot.z));      //robot위치
+			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
+			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
+			/*오른다리*/ {
+				glUniform3f(objColorLocation, 0.0f, 0.6f, 0.6f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                                //몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                                  //다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*왼다리*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                               //몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                                 //다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /* 몸통 */ {
+				glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.35f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*오른팔*/ {
+				glUniform3f(objColorLocation, 0.6f, 0.6f, 0.0f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
+				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*왼  팔*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
+				model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /* 머리 */ {
+				glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.55f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));                                                                       //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			}
+		}
+		/*이건 장애물 로봇*/
+		for (int i = 0; i < 9; ++i) {
+			glUniform3f(objColorLocation, block_robot[i].color[0], block_robot[i].color[1], block_robot[i].color[2]);
+			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
+			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(block_robot[i].x, 0.0f, block_robot[i].z));      //robot위치
+			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(block_robot[i].y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
+			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
+			/*오른다리*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                                //몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                  //다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*왼다리*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                               //몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                 //다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /* 몸통 */ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.35f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));                                                                      //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*오른팔*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /*왼  팔*/ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
+				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			} /* 머리 */ {
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.55f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));                                                                       //size
+				model = axisTransForm * shapeTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24); //정육면체
+			}
+		}
+		/*이건 일단 축*/
+		{
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glUniform3f(objColorLocation, 0.2f, 0.2f, 0.2f);
+			glDrawArrays(GL_LINES, 24, 6); //축
+		}
+		/*여기는 맵(바닥)*/
+		{
+			/*트랙1*/
+			{
+				glUniform3f(objColorLocation, 0.75f, 0.75f, 1.0f);
+
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(200.0f + 1.0f - 2.0f, 0.0f, 1.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f + 2.0f));
+				model = glm::scale(model, glm::vec3(200.0f, 0.0f, 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-200.0f - 1.0f + 2.0f, 0.0f, 1.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			}
+
+			/*트랙2*/
+			{
+				glUniform3f(objColorLocation, 0.5f, 0.5f, 1.0f);
+
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(200.0f + 1.0f, 0.0f, 0.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f));
+				model = glm::scale(model, glm::vec3(200.0f + 1.0f, 0.0f, 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-200.0f - 1.0f, 0.0f, 0.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			}
+
+			/*트랙3*/
+			{
+				glUniform3f(objColorLocation, 0.25f, 0.25f, 1.0f);
+
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(200.0f + 1.0f + 2.0f, 0.0f, -1.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f - 2.0f));
+				model = glm::scale(model, glm::vec3(200.0f + 1.0f + 1.0f, 0.0f, 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+				model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(-200.0f - 1.0f - 2.0f, 0.0f, -1.0f));
+				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			}
+		}
+		/*골대*/
+		{
+			/*기둥1*/
+			{
+				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 149.f));
+				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24);
+			}
+
+			/*기둥2*/
+			{
+				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 149.f));
+				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 24);
+			}
+
+			/*깃발*/
+			{
+				glUniform3f(objColorLocation, 1.f, 1.f, 1.f);
+				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+				model = glm::translate(model, glm::vec3(201.f, 3.2f, 148.f));
+				model = glm::scale(model, glm::vec3(3.0f, 0.8f, 1.f));
+				model = axisTransForm * model;
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+				glDrawArrays(GL_QUADS, 0, 4);
+			}
+		}
+		/*Start 지점*/
+		{
+			glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
+
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::translate(model, glm::vec3(-201.0f, 0.5f, 149.0f));
+			model = glm::scale(model, glm::vec3(3.0f, 0.0f, 0.1f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
+		}
+		/*큐브맵*/
+		{
+			glUniform1i(indexLocation, 1);
+			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::scale(model, glm::vec3(250.0f, 10.0f, 200.0f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+			glDrawArrays(GL_QUADS, 4, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+			glDrawArrays(GL_QUADS, 8, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+			glDrawArrays(GL_QUADS, 12, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+			glDrawArrays(GL_QUADS, 16, 4); //사각형 크기 1.0 x 0.0 x 1.0
+
+			glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+			glDrawArrays(GL_QUADS, 20, 4); //사각형 크기 1.0 x 0.0 x 1.0
+		}
+
+	}
+
 	glutSwapBuffers();
 }
 GLvoid Reshape(int w, int h)
@@ -1063,7 +1407,9 @@ GLvoid TimerFunc(int x)
 			player_robot.speed += 0.001f;
 
 		if (collision(goal, player_robot.bb)) {
+			player_robot.x = 0.f, player_robot.z = 0.f, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
 			player_robot.move = false;
+			end = true;
 		}
 	}
 	if (player_robot.y < 0) {
