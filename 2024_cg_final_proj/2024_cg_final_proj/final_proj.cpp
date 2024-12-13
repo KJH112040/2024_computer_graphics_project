@@ -61,39 +61,39 @@ GLubyte* LoadDIBitmap(const char* filename, BITMAPINFO** info)
 	GLubyte* bits;
 	int bitsize{}, infosize{};
 	BITMAPFILEHEADER header;
-	//--- ï¿½ï¿½ï¿½Ì³Ê¸ï¿½ ï¿½Ð±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	//--- ¹ÙÀÌ³Ê¸® ÀÐ±â ¸ðµå·Î ÆÄÀÏÀ» ¿¬´Ù
 	if ((fp = fopen(filename, "rb")) == NULL)
 		return NULL;
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð´Â´ï¿½.
+	//--- ºñÆ®¸Ê ÆÄÀÏ Çì´õ¸¦ ÀÐ´Â´Ù.
 	if (fread(&header, sizeof(BITMAPFILEHEADER), 1, fp) < 1) {
 		fclose(fp); return NULL;
 	}
-	//--- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ BMP ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ñ´ï¿½.
+	//--- ÆÄÀÏÀÌ BMP ÆÄÀÏÀÎÁö È®ÀÎÇÑ´Ù.
 	if (header.bfType != 'MB') {
 		fclose(fp); return NULL;
 	}
-	//--- BITMAPINFOHEADER ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+	//--- BITMAPINFOHEADER À§Ä¡·Î °£´Ù.
 	infosize = header.bfOffBits - sizeof(BITMAPFILEHEADER);
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ ï¿½Ñ´ï¿½.
+	//--- ºñÆ®¸Ê ÀÌ¹ÌÁö µ¥ÀÌÅÍ¸¦ ³ÖÀ» ¸Þ¸ð¸® ÇÒ´çÀ» ÇÑ´Ù.
 	if ((*info = (BITMAPINFO*)malloc(infosize)) == NULL) {
 		fclose(fp); return NULL;
 	}
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð´Â´ï¿½.
+	//--- ºñÆ®¸Ê ÀÎÆ÷ Çì´õ¸¦ ÀÐ´Â´Ù.
 	if (fread(*info, 1, infosize, fp) < (unsigned int)infosize) {
 		free(*info);
 		fclose(fp); return NULL;
 	}
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	//--- ºñÆ®¸ÊÀÇ Å©±â ¼³Á¤
 	if ((bitsize = (*info)->bmiHeader.biSizeImage) == 0)
 		bitsize = ((*info)->bmiHeader.biWidth *
 			(*info)->bmiHeader.biBitCount + 7) / 8 *
 		abs((*info)->bmiHeader.biHeight);
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ Å©ï¿½â¸¸Å­ ï¿½Þ¸ð¸®¸ï¿½ ï¿½Ò´ï¿½ï¿½Ñ´ï¿½.
+	//--- ºñÆ®¸ÊÀÇ Å©±â¸¸Å­ ¸Þ¸ð¸®¸¦ ÇÒ´çÇÑ´Ù.
 	if ((bits = (GLubyte*)malloc(bitsize)) == NULL) {
 		free(*info);
 		fclose(fp); return NULL;
 	}
-	//--- ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ bit(GLubyte Å¸ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+	//--- ºñÆ®¸Ê µ¥ÀÌÅÍ¸¦ bit(GLubyte Å¸ÀÔ)¿¡ ÀúÀåÇÑ´Ù.
 	if (fread(bits, 1, bitsize, fp) < (unsigned int)bitsize) {
 		free(*info); free(bits);
 		fclose(fp); return NULL;
@@ -415,8 +415,8 @@ void InitTextures()
 	glUseProgram(shaderID);
 
 	//--- texture[0]
-	int tLocation1 = glGetUniformLocation(shaderID, "outTexture1"); //--- outTexture1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	glUniform1i(tLocation1, 0); //--- ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ 0ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	int tLocation1 = glGetUniformLocation(shaderID, "outTexture1"); //--- outTexture1 À¯´ÏÆû »ùÇÃ·¯ÀÇ À§Ä¡¸¦ °¡Á®¿È
+	glUniform1i(tLocation1, 0); //--- »ùÇÃ·¯¸¦ 0¹ø À¯´ÖÀ¸·Î ¼³Á¤
 	glBindTexture(GL_TEXTURE_2D, texture_index[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -482,6 +482,9 @@ GLvoid drawScene()
 
 		//¿ÀºêÁ§Æ® »ö ÁöÁ¤
 		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
+
+		//glActiveTexture(GL_TEXTURE0); //--- À¯´Ö 0À» È°¼ºÈ­
+		//glBindTexture(GL_TEXTURE_2D, texture_index[0]);
 
 		/*¿©±â¿¡ ·Îº¿*/
 		{
