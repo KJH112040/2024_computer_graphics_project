@@ -2,22 +2,27 @@
 #include <iostream>
 #include <gl/glew.h>
 #include <gl/freeglut.h>
-#include <gl/freeglut_ext.h>/*
+#include <gl/freeglut_ext.h>
 #include <gl/glm/glm.hpp>
 #include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>*/
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm/glm.hpp>
+//#include <gl/glm/glm/ext.hpp>
+//#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <time.h>
 
+typedef struct Bounding_Box {
+    GLfloat x1, z1, x2, z2;
+}BB;
+
 struct Robot {
-    GLfloat bb[2][3], //왼쪽 상단, 오른쪽 하단
+    GLfloat 
         size, x, z, road[2][2],
         speed = 0.0f,
         shake = 1, y_radian, // shake = (발,다리)회전 각도, radian = 몸 y축 회전 각도
         color[3] = {};
+    BB bb; //왼쪽 상단, 오른쪽 하단
     int shake_dir, dir;
     bool move; // 움직이고 있는지(대기 후 이동)
 };
