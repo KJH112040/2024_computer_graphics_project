@@ -363,6 +363,9 @@ void InitBuffer()
 }
 
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
+BB map_bb1{-204.0f,-153.f,-198.f,151.f}, map_bb2{-204.f,-153.f,204.f,-147.f}, map_bb3{198.0f,-153.f,204.f,151.f};
+
+bool collision(BB obj_a, BB obj_b);
 
 GLvoid drawScene()
 {
@@ -922,4 +925,13 @@ GLvoid TimerFunc(int x)
     }
     glutTimerFunc(10, TimerFunc, 1);
     glutPostRedisplay();
+}
+
+bool collision(BB obj_a, BB obj_b) {
+    if (obj_a.x1 > obj_b.x2) return false;
+    if (obj_a.x2 < obj_b.x1) return false;
+    if (obj_a.z1 > obj_b.z2) return false;
+    if (obj_a.z2 < obj_b.z1)return false;
+
+    return true;
 }
