@@ -202,7 +202,7 @@ GLuint fragmentShader;
 
 int main(int argc, char** argv)
 {
-	background_width = 800, background_height = 800;
+	background_width = 1200, background_height = 800;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
@@ -386,7 +386,7 @@ GLvoid drawScene()
 
 		//¿ø±Ù Åõ¿µ
 		glm::mat4 kTransform = glm::mat4(1.0f);
-		kTransform = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+		kTransform = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 50.0f);
 		kTransform = glm::translate(kTransform, glm::vec3(0.0f, 0.0f, -8.0f));
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
@@ -481,7 +481,6 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
 			}
 		}
-
 		/*ÀÌ°Ç Àå¾Ö¹° ·Îº¿*/
 		for (int i = 0; i < 9; ++i) {
 			glUniform3f(objColorLocation, block_robot[i].color[0], block_robot[i].color[1], block_robot[i].color[2]);
@@ -541,7 +540,6 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 0, 24); //Á¤À°¸éÃ¼
 			}
 		}
-
 		/*ÀÌ°Ç ÀÏ´Ü Ãà*/
 		{
 			glm::mat4 model = glm::mat4(1.0f);//º¯È¯ Çà·Ä »ý¼º T
@@ -552,9 +550,6 @@ GLvoid drawScene()
 			glUniform3f(objColorLocation, 0.2f, 0.2f, 0.2f);
 			glDrawArrays(GL_LINES, 24, 6); //Ãà
 		}
-
-		// ¤§ÀÚ ¸ÊÀº ¿Ï¼º, ¤§ÀÚ ¸Ê(Æ®·¢)ÀÇ À§Ä¡ Á¶Á¤ ÇÊ¿ä, ¹Ì´Ï¸Ê ¼öÁ¤ ÇÊ¿ä
-
 		/*¿©±â´Â ¸Ê(¹Ù´Ú)*/
 		{
 			/*Æ®·¢1*/
@@ -644,7 +639,6 @@ GLvoid drawScene()
 				glDrawArrays(GL_QUADS, 30, 4); //»ç°¢Çü Å©±â 1.0 x 0.0 x 1.0
 			}
 		}
-
 		/*°ñ´ë*/
 		{
 			/*±âµÕ1*/
@@ -682,7 +676,7 @@ GLvoid drawScene()
 		}
 	}
 	//¹Ì´Ï ¸Ê===================================================================================================================================================================================
-	{
+	if (1) {
 		glViewport(3 * background_width / 4, 3 * background_height / 4, background_width / 4, background_height / 4); /*´ëÃæ ¿À¸¥ÂÊ»ó´Ü ¾îµò°¡¿¡ ¹èÄ¡ ¹Ù¶ó¿ä*/
 
 		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//¿ùµå º¯È¯ Çà·Ä°ªÀ» ¼ÎÀÌ´õÀÇ uniform mat4 modelTransform¿¡°Ô ³Ñ°ÜÁÜ
@@ -695,7 +689,7 @@ GLvoid drawScene()
 
 		// Åõ¿µ
 		glm::mat4 kTransform = glm::mat4(1.0f);
-		kTransform = glm::ortho(-7.0f, 7.0f, -7.0f, 7.0f, -5.0f, 5.0f);
+		kTransform = glm::ortho(-7.5f, 7.5f, -8.0f, 8.0f, -5.0f, 5.0f);
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
 		//ºäÀ× º¯È¯
@@ -830,7 +824,6 @@ GLvoid drawScene()
 
 			glDrawArrays(GL_QUADS, 30, 4); //»ç°¢Çü Å©±â 1.0 x 0.0 x 1.0
 		}
-
 		/*ÇÃ·¹ÀÌ¾î*/
 		{
 			glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
@@ -895,7 +888,7 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 
 GLvoid TimerFunc(int x)
 {
-	if (player_robot.move/*trueÀÏ¶§ ·Îº¿ ¿òÁ÷ÀÓ, È÷ÆR*/) {
+	if (player_robot.move) {
 		if(collision(map_bb,get_bb(player_robot)) || collision(map_bb2, get_bb(player_robot))|| collision(map_bb3, get_bb(player_robot))){
 			player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
 			player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
@@ -916,7 +909,7 @@ GLvoid TimerFunc(int x)
 		player_robot.speed += 0.01f;
 
 		if (player_robot.y < -5.f) {
-			player_robot.y_radian = 180.0f, player_robot.shake_dir = 1;
+			player_robot.y_radian = 180.0f, player_robot.shake_dir = 0, player_robot.shake = false, player_robot.speed = 0.0f;;
 			player_robot.x = -201, player_robot.z = 150, player_robot.y = 0.f;
 		}
 	}
