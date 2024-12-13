@@ -3,12 +3,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-//#include <gl/glm/glm.hpp>
-//#include <gl/glm/ext.hpp>
-//#include <gl/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm/glm.hpp>
+//#include <gl/glm/glm/ext.hpp>
+//#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 
 typedef struct Bounding_Box {
@@ -770,7 +770,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 150.9f));
+				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 150.f));
 				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -781,7 +781,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 150.9f));
+				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 150.f));
 				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -792,7 +792,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 1.f, 1.f, 1.f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(201.f, 3.2f, 149.9f));
+				model = glm::translate(model, glm::vec3(201.f, 3.2f, 149.f));
 				model = glm::scale(model, glm::vec3(3.0f, 0.8f, 1.f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -1007,6 +1007,9 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 	case 'm':
 		player_robot.move = true;
 		player_robot.shake_dir = 1;
+		break;
+	case't':
+		player_robot.x = 201, player_robot.z = 140, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
 		break;
 	case 'q':
 		glutLeaveMainLoop();
