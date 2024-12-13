@@ -486,7 +486,7 @@ void InitTextures()
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data6);
 }
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
-BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f };
+BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f }, goal{198.f,149.f,204.f,151.f};
 
 GLvoid drawScene()
 {
@@ -770,7 +770,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 150.f));
+				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 149.f));
 				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -781,7 +781,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 150.f));
+				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 149.f));
 				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -792,7 +792,7 @@ GLvoid drawScene()
 			{
 				glUniform3f(objColorLocation, 1.f, 1.f, 1.f);
 				glm::mat4 model = glm::mat4(1.0f);//函券 青纺 积己 T
-				model = glm::translate(model, glm::vec3(201.f, 3.2f, 149.f));
+				model = glm::translate(model, glm::vec3(201.f, 3.2f, 148.f));
 				model = glm::scale(model, glm::vec3(3.0f, 0.8f, 1.f));
 				model = axisTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -1061,6 +1061,10 @@ GLvoid TimerFunc(int x)
 			player_robot.shake_dir *= -1;
 		if (player_robot.speed < 0.25f)
 			player_robot.speed += 0.001f;
+
+		if (collision(goal, player_robot.bb)) {
+			player_robot.move = false;
+		}
 	}
 	if (player_robot.y < 0) {
 		player_robot.y -= player_robot.speed;
