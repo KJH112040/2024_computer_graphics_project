@@ -34,6 +34,7 @@ GLvoid Reshape(int w, int h);
 GLvoid TimerFunc(int x);
 
 void InitBuffer();
+void InitTextures();
 void make_vertexShaders();
 void make_fragmentShaders();
 GLuint make_shaderProgram();
@@ -53,6 +54,52 @@ char* filetobuf(const char* file)
 	fclose(fptr); // Close the file 
 	buf[length] = 0; // Null terminator 
 	return buf; // Return the buffer 
+}
+GLubyte* LoadDIBitmap(const char* filename, BITMAPINFO** info)
+{
+	FILE* fp;
+	GLubyte* bits;
+	int bitsize{}, infosize{};
+	BITMAPFILEHEADER header;
+	//--- ���̳ʸ� �б� ���� ������ ����
+	if ((fp = fopen(filename, "rb")) == NULL)
+		return NULL;
+	//--- ��Ʈ�� ���� ����� �д´�.
+	if (fread(&header, sizeof(BITMAPFILEHEADER), 1, fp) < 1) {
+		fclose(fp); return NULL;
+	}
+	//--- ������ BMP �������� Ȯ���Ѵ�.
+	if (header.bfType != 'MB') {
+		fclose(fp); return NULL;
+	}
+	//--- BITMAPINFOHEADER ��ġ�� ����.
+	infosize = header.bfOffBits - sizeof(BITMAPFILEHEADER);
+	//--- ��Ʈ�� �̹��� �����͸� ���� �޸� �Ҵ��� �Ѵ�.
+	if ((*info = (BITMAPINFO*)malloc(infosize)) == NULL) {
+		fclose(fp); return NULL;
+	}
+	//--- ��Ʈ�� ���� ����� �д´�.
+	if (fread(*info, 1, infosize, fp) < (unsigned int)infosize) {
+		free(*info);
+		fclose(fp); return NULL;
+	}
+	//--- ��Ʈ���� ũ�� ����
+	if ((bitsize = (*info)->bmiHeader.biSizeImage) == 0)
+		bitsize = ((*info)->bmiHeader.biWidth *
+			(*info)->bmiHeader.biBitCount + 7) / 8 *
+		abs((*info)->bmiHeader.biHeight);
+	//--- ��Ʈ���� ũ�⸸ŭ �޸𸮸� �Ҵ��Ѵ�.
+	if ((bits = (GLubyte*)malloc(bitsize)) == NULL) {
+		free(*info);
+		fclose(fp); return NULL;
+	}
+	//--- ��Ʈ�� �����͸� bit(GLubyte Ÿ��)�� �����Ѵ�.
+	if (fread(bits, 1, bitsize, fp) < (unsigned int)bitsize) {
+		free(*info); free(bits);
+		fclose(fp); return NULL;
+	}
+	fclose(fp);
+	return bits;
 }
 
 GLint background_width, background_height;
@@ -199,6 +246,7 @@ GLchar* vertexSource, * fragmentSource;
 GLuint shaderID;
 GLuint vertexShader;
 GLuint fragmentShader;
+unsigned int texture_index[2];
 
 int main(int argc, char** argv)
 {
@@ -359,7 +407,24 @@ void InitBuffer()
 			block_robot[i].y_radian = 180.0f;
 	}
 }
+void InitTextures() 
+{
+	BITMAPINFO* bmp;
 
+	glGenTextures(2, texture_index);
+	glUseProgram(shaderID);
+
+	//--- texture[0]
+	int tLocation1 = glGetUniformLocation(shaderID, "outTexture1"); //--- outTexture1 ������ ���÷��� ��ġ�� ������
+	glUniform1i(tLocation1, 0); //--- ���÷��� 0�� �������� ����
+	glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//unsigned char* data1 = LoadDIBitmap("front.bmp", &bmp);
+	//glTexImage2D(GL_TEXTURE_2D, 0, 3, 1000, 1000, 0, GL_BGR, GL_UNSIGNED_BYTE, data1);
+}
 GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f };
 
