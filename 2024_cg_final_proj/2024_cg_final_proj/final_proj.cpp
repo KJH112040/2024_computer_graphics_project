@@ -3,12 +3,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
-//#include <gl/glm/glm/glm.hpp>
-//#include <gl/glm/glm/ext.hpp>
-//#include <gl/glm/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm.hpp>
+//#include <gl/glm/ext.hpp>
+//#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <ctime>
 #include <random>
@@ -35,6 +35,7 @@ GLvoid Reshape(int w, int h);
 GLvoid TimerFunc(int x);
 GLvoid Bump(int index);
 
+int read_ten(int Vplace,int num);
 BB get_bb(Robot robot);
 bool collision(BB obj_a, BB obj_b);
 
@@ -445,6 +446,9 @@ void InitBuffer()
 
 		block_robot[17].road[0][0] = 202,	block_robot[17].road[0][1] = 140;
 		block_robot[17].road[1][0] = 202,	block_robot[17].road[1][1] = 50;
+
+		block_robot[18].road[0][0] = 201,	block_robot[18].road[0][1] = 148;
+		block_robot[18].road[1][0] = 201,	block_robot[18].road[1][1] = 148;
 	}
 	for (int i = 0; i < 19; ++i) {
 		block_robot[i].x = block_robot[i].road[0][0];
@@ -534,8 +538,8 @@ void InitTextures()
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data6);
 }
 
-GLfloat camera_move[3]{ 0.0f, 2.0f, 2.0f };
-GLfloat camera_look[3]{ 0.0f, 0.5f, 0.0f };
+GLfloat camera_move[3]{ 0.0f, 2.0f, 2.0f }, camera_look[3]{ 0.0f, 0.5f, 0.0f }, light_pos[3]{ 0.0f, 2.0f, 2.0f };
+int end_anime;
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f }, goal{198.f,149.f,204.f,151.f};
 bool end = false;
 
@@ -1079,8 +1083,9 @@ GLvoid drawScene()
 		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor");	//--- lightColor 값 전달
 		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor");	//--- object Color값 전달
 
+		glm::vec4 light_pos_location = axisTransForm * glm::vec4(light_pos[0], light_pos[1], light_pos[2], 1.0f);
 		//조명 위치 및 색
-		glUniform3f(lightPosLocation, 0.0f, 100.0f, 0.0f);
+		glUniform3f(lightPosLocation, light_pos_location.x, light_pos_location.y, light_pos_location.z);
 		glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 
 		//오브젝트 색 지정
@@ -1125,7 +1130,7 @@ GLvoid drawScene()
 				glUniform3f(objColorLocation, 0.6f, 0.6f, 0.0f);
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
-				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(-player_robot.shake * 3), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
@@ -1134,7 +1139,7 @@ GLvoid drawScene()
 			} /*왼  팔*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
-				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(-player_robot.shake * 3), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
@@ -1259,7 +1264,8 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 			player_robot.shake_dir = 1;
 		break;
 	case't':
-		player_robot.x = 201, player_robot.z = 140, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
+		if (!end)
+			player_robot.x = 201, player_robot.z = 140, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
 		break;
 	case 'q':
 		glutLeaveMainLoop();
@@ -1298,13 +1304,37 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 GLvoid TimerFunc(int x)
 {
 	if (end) {
-		player_robot.shake += player_robot.shake_dir * 1.0f;
-		if (player_robot.shake <= 0.0f || player_robot.shake >= 60.0f)
-			player_robot.shake_dir *= -1;
-		for (int i = 0; i < 9; ++i) {
-			block_robot[i].shake += block_robot[i].shake_dir * player_robot.speed;
-			if (block_robot[i].shake <= 0.0f || block_robot[i].shake >= 60.0f)
-				block_robot[i].shake_dir *= -1;
+		if (end_anime == 0) {
+			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 cameraPos_rotate = glm::rotate(cameraPos_rotate, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, -1.0f));
+			glm::vec4 rotate_pos = cameraPos_rotate * glm::vec4(camera_look[0], light_pos[1], light_pos[2], 1.0f);
+			camera_look[0] = rotate_pos[0], camera_look[2] = rotate_pos[2];
+			if (camera_look[0] == 0.0f)
+				end_anime++;
+		}
+		else if (end_anime < read_ten(0, finish_time - start_time)) {
+			light_pos[1] += 0.1f;
+			end_anime++;
+		}
+		else if (end_anime == read_ten(0, finish_time - start_time)) {
+			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 cameraPos_rotate = glm::rotate(cameraPos_rotate, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, -1.0f));
+			glm::vec4 rotate_pos = cameraPos_rotate * glm::vec4(camera_look[0], light_pos[1], light_pos[2], 1.0f);
+			camera_look[0] = rotate_pos[0], camera_look[2] = rotate_pos[2];
+			if (camera_look[0] == 0.0f)
+				end_anime++;
+		}
+		else {
+			player_robot.shake += player_robot.shake_dir * 1.0f;
+			if (player_robot.shake <= 0.0f || player_robot.shake >= 60.0f)
+				player_robot.shake_dir *= -1;
+			for (int i = 0; i < 19; ++i) {
+				block_robot[i].shake += block_robot[i].shake_dir * player_robot.speed;
+				if (block_robot[i].shake <= 0.0f || block_robot[i].shake >= 60.0f)
+					block_robot[i].shake_dir *= -1;
+			}
 		}
 	}
 	else {
@@ -1406,7 +1436,7 @@ GLvoid Bump(int index)
 		if (collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb) || collision(map_bb3, player_robot.bb)) {
 			GLfloat radian = atan2(player_robot.road[0][1] - player_robot.road[1][1], player_robot.road[1][0] - player_robot.road[0][0]);
 			player_robot.x += sin(radian) * player_robot.speed;
-			player_robot.z += cos(radian) * player_robot.speed;
+			player_robot.z -= cos(radian) * player_robot.speed;
 			player_robot.bb = get_bb(player_robot);
 		}
 		else {
@@ -1428,6 +1458,14 @@ GLvoid Bump(int index)
 	}
 }
 
+int read_ten(int Vplace, int num)
+{
+	num /= 10, Vplace++;
+	if (num == 0)
+		return Vplace;
+	else
+		read_ten(Vplace, num);
+}
 BB get_bb(Robot robot)
 {
 	glm::mat4 Transform = glm::mat4(1.0f);//변환 행렬 생성 T
