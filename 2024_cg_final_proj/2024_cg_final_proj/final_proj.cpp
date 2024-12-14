@@ -3,14 +3,15 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
-//#include <gl/glm/glm/glm.hpp>
-//#include <gl/glm/glm/ext.hpp>
-//#include <gl/glm/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm.hpp>
+//#include <gl/glm/ext.hpp>
+//#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm/glm.hpp>
+#include <gl/glm/glm/ext.hpp>
+#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <ctime>
+#include <random>
 
 typedef struct Bounding_Box {
 	GLfloat x1, z1, x2, z2;
@@ -20,13 +21,12 @@ struct Robot {
 	GLfloat size{}, x{}, z{}, road[2][2]{},
 		speed = 0.0f,
 		shake = 1, y_radian = 180.0f, // shake = (발,다리)회전 각도, radian = 몸 y축 회전 각도
-		color[3] = {},
 		y{};
 	BB bb{}; //왼쪽 상단, 오른쪽 하단
 	int shake_dir{}, dir{};
 	bool move = false; // 움직이고 있는지(대기 후 이동)
 };
-Robot player_robot, block_robot[9];
+Robot player_robot, block_robot[19];
 
 GLvoid drawScene();
 GLvoid KeyBoard(unsigned char key, int x, int y);
@@ -251,7 +251,7 @@ GLchar* vertexSource, * fragmentSource;
 GLuint shaderID;
 GLuint vertexShader;
 GLuint fragmentShader;
-unsigned int texture_index[6];
+unsigned int texture_runmap[6];
 BITMAPINFO* bmp;
 
 int main(int argc, char** argv)
@@ -392,19 +392,64 @@ void InitBuffer()
 	player_robot.y_radian = 180.0f, player_robot.shake_dir = 1;
 	player_robot.x = -201, player_robot.z = 150, player_robot.y=0.f;
 	{
-		block_robot[0].road[0][0] = -203, block_robot[0].road[0][1] = 150;
-		block_robot[0].road[1][0] = -203, block_robot[0].road[1][1] = -150;
+		block_robot[0].road[0][0] = -203,	block_robot[0].road[0][1] = 140;
+		block_robot[0].road[1][0] = -203,	block_robot[0].road[1][1] = -150;
 
-		block_robot[1].road[0][0] = -199, block_robot[1].road[0][1] = 149;
-		block_robot[1].road[1][0] = -199, block_robot[1].road[1][1] = -149;
+		block_robot[1].road[0][0] = -199,	block_robot[1].road[0][1] = 140;
+		block_robot[1].road[1][0] = -199,	block_robot[1].road[1][1] = -150;
 
-		block_robot[2].road[0][0] = -203, block_robot[2].road[0][1] = -150;
-		block_robot[2].road[1][0] = -203, block_robot[2].road[1][1] = 150;
+		block_robot[2].road[0][0] = -201,	block_robot[2].road[0][1] = 130;
+		block_robot[2].road[1][0] = -201,	block_robot[2].road[1][1] = -150;
+
+		block_robot[3].road[0][0] = -202,	block_robot[3].road[0][1] = 0;
+		block_robot[3].road[1][0] = -202,	block_robot[3].road[1][1] = 150;
+
+		block_robot[4].road[0][0] = -200,	block_robot[4].road[0][1] = 0;
+		block_robot[4].road[1][0] = -200,	block_robot[4].road[1][1] = 150;
+
+		block_robot[5].road[0][0] = -201,	block_robot[5].road[0][1] = 5;
+		block_robot[5].road[1][0] = -201,	block_robot[5].road[1][1] = 150;
+
+		block_robot[6].road[0][0] = -195,	block_robot[6].road[0][1] = -153;
+		block_robot[6].road[1][0] = -195,	block_robot[6].road[1][1] = -147;
+		
+		block_robot[7].road[0][0] = 200,	block_robot[7].road[0][1] = -150;
+		block_robot[7].road[1][0] = 190,	block_robot[7].road[1][1] = -150;
+
+		block_robot[8].road[0][0] = 200,	block_robot[8].road[0][1] = -153;
+		block_robot[8].road[1][0] = -200,	block_robot[8].road[1][1] = -148;
+
+		block_robot[9].road[0][0] = 200,	block_robot[9].road[0][1] = -152;
+		block_robot[9].road[1][0] = -200,	block_robot[9].road[1][1] = -152;
+
+		block_robot[10].road[0][0] = 198,	block_robot[10].road[0][1] = -150;
+		block_robot[10].road[1][0] = -198,	block_robot[10].road[1][1] = -150;
+
+		block_robot[11].road[0][0] = 196,	block_robot[11].road[0][1] = -148;
+		block_robot[11].road[1][0] = -196,	block_robot[11].road[1][1] = -148;
+
+		block_robot[12].road[0][0] = 200,	block_robot[12].road[0][1] = 0;
+		block_robot[12].road[1][0] = 200,	block_robot[12].road[1][1] = 0;
+
+		block_robot[13].road[0][0] = 200,	block_robot[13].road[0][1] = 0;
+		block_robot[13].road[1][0] = 190,	block_robot[13].road[1][1] = 0;
+
+		block_robot[14].road[0][0] = 200,	block_robot[14].road[0][1] = 0;
+		block_robot[14].road[1][0] = -200,	block_robot[14].road[1][1] = 0;
+
+		block_robot[15].road[0][0] = 200,	block_robot[15].road[0][1] = -152;
+		block_robot[15].road[1][0] = -200,	block_robot[15].road[1][1] = -152;
+
+		block_robot[16].road[0][0] = 198,	block_robot[16].road[0][1] = -150;
+		block_robot[16].road[1][0] = -198,	block_robot[16].road[1][1] = -150;
+
+		block_robot[17].road[0][0] = 196,	block_robot[17].road[0][1] = -148;
+		block_robot[17].road[1][0] = -196,	block_robot[17].road[1][1] = -148;
 	}
-	for (int i = 0; i < 9; ++i) {
+	for (int i = 0; i < 19; ++i) {
 		block_robot[i].x = block_robot[i].road[0][0];
 		block_robot[i].z = block_robot[i].road[0][1];
-		block_robot[i].speed = 0.15f, block_robot[i].shake_dir = 1;
+		block_robot[i].speed = 0.2f, block_robot[i].shake_dir = 1;
 		if (block_robot[i].road[0][0] < block_robot[i].road[1][0])
 			block_robot[i].y_radian = 90.0f;
 		if (block_robot[i].road[0][0] > block_robot[i].road[1][0])
@@ -419,13 +464,13 @@ void InitBuffer()
 }
 void InitTextures() 
 {
-	glGenTextures(6, texture_index);
+	glGenTextures(6, texture_runmap);
 	glUseProgram(shaderID);
 
 	//--- texture[0]
 	int tLocation1 = glGetUniformLocation(shaderID, "outTexture1"); //--- outTexture1 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation1, 0); //--- 샘플러를 0번 유닛으로 설정
-	glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -436,7 +481,7 @@ void InitTextures()
 	//--- texture[1]
 	int tLocation2 = glGetUniformLocation(shaderID, "outTexture2"); //--- outTexture2 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation2, 1);
-	glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[1]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -447,7 +492,7 @@ void InitTextures()
 	//--- texture[2]
 	int tLocation3 = glGetUniformLocation(shaderID, "outTexture3"); //--- outTexture3 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation3, 2);
-	glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[2]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -458,7 +503,7 @@ void InitTextures()
 	//--- texture[3]
 	int tLocation4 = glGetUniformLocation(shaderID, "outTexture4"); //--- outTexture4 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation4, 3);
-	glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[3]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -469,7 +514,7 @@ void InitTextures()
 	//--- texture[4]
 	int tLocation5 = glGetUniformLocation(shaderID, "outTexture5"); //--- outTexture5 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation5, 4);
-	glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[4]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -480,7 +525,7 @@ void InitTextures()
 	//--- texture[5]
 	int tLocation6 = glGetUniformLocation(shaderID, "outTexture6"); //--- outTexture6 유니폼 샘플러의 위치를 가져옴
 	glUniform1i(tLocation6, 5);
-	glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[5]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -488,7 +533,9 @@ void InitTextures()
 	unsigned char* data6 = LoadDIBitmap("right.bmp", &bmp);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data6);
 }
-GLfloat camera_move[3]{ 0.0f, 0.0f, 3.0f };
+
+GLfloat camera_move[3]{ 0.0f, 2.0f, 2.0f };
+GLfloat camera_look[3]{ 0.0f, 0.5f, 0.0f };
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f }, goal{198.f,149.f,204.f,151.f};
 bool end = false;
 
@@ -512,13 +559,13 @@ GLvoid drawScene()
 
 		//원근 투영
 		glm::mat4 kTransform = glm::mat4(1.0f);
-		kTransform = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 50.0f);
+		kTransform = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 300.0f);
 		kTransform = glm::translate(kTransform, glm::vec3(0.0f, 0.0f, -8.0f));
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
 		//뷰잉 변환
 		glm::mat4 vTransform = glm::mat4(1.0f);
-		glm::vec3 cameraPos = glm::vec3(player_robot.x - 1.0f * sin(glm::radians(player_robot.y_radian)), 1.0f, player_robot.z - 1.0f * cos(glm::radians(player_robot.y_radian))); //--- 카메라 위치
+		glm::vec3 cameraPos = glm::vec3(player_robot.x - 1.0f * sin(glm::radians(player_robot.y_radian)), 0.5f, player_robot.z - 1.0f * cos(glm::radians(player_robot.y_radian))); //--- 카메라 위치
 		glm::vec3 cameraDirection = glm::vec3(player_robot.x, 0.0f, player_robot.z); //--- 카메라 바라보는 방향
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
@@ -539,7 +586,7 @@ GLvoid drawScene()
 		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
 
 		//조명 위치 및 색
-		glUniform3f(lightPosLocation, 0.0f, 3.0f, 0.0f);
+		glUniform3f(lightPosLocation, 200.0f, 200.0f, 150.0f);
 		glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 
 		//오브젝트 색 지정
@@ -549,7 +596,6 @@ GLvoid drawScene()
 
 		/*여기에 로봇*/
 		{
-			glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
 			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
 			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, player_robot.y, player_robot.z));      //robot위치
 			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
@@ -611,8 +657,8 @@ GLvoid drawScene()
 			}
 		}
 		/*이건 장애물 로봇*/
-		for (int i = 0; i < 9; ++i) {
-			glUniform3f(objColorLocation, block_robot[i].color[0], block_robot[i].color[1], block_robot[i].color[2]);
+		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
+		for (int i = 0; i < 19; ++i) {
 			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
 			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(block_robot[i].x, 0.0f, block_robot[i].z));      //robot위치
 			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(block_robot[i].y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
@@ -820,26 +866,26 @@ GLvoid drawScene()
 			glUniform1i(indexLocation, 1);
 			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::scale(model, glm::vec3(250.0f, 10.0f, 200.0f));
+			model = glm::scale(model, glm::vec3(210.0f, 10.0f, 160.0f));
 			model = axisTransForm * model;
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[0]);
 			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[1]);
 			glDrawArrays(GL_QUADS, 4, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[2]);
 			glDrawArrays(GL_QUADS, 8, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[3]);
 			glDrawArrays(GL_QUADS, 12, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[4]);
 			glDrawArrays(GL_QUADS, 16, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[5]);
 			glDrawArrays(GL_QUADS, 20, 4); //사각형 크기 1.0 x 0.0 x 1.0
 		}
 	}
@@ -997,25 +1043,24 @@ GLvoid drawScene()
 			glDrawArrays(GL_QUADS, 0, 24); //정육면체
 		}
 	}
-
+	//엔딩 창===================================================================================================================================================================================
 	if (end) {
-
 		glViewport(0, 0, background_width, background_height);
 
-		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
-		unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");//위와 동일
-		unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");//위와 동일
+		unsigned int modelLocation = glGetUniformLocation(shaderID, "modelTransform");				//월드 변환 행렬값을 셰이더의 uniform mat4 modelTransform에게 넘겨줌
+		unsigned int viewLocation = glGetUniformLocation(shaderID, "viewTransform");				//위와 동일
+		unsigned int projectionLocation = glGetUniformLocation(shaderID, "projectionTransform");	//위와 동일
 
 		//원근 투영
 		glm::mat4 kTransform = glm::mat4(1.0f);
-		kTransform = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 50.0f);
+		kTransform = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 		kTransform = glm::translate(kTransform, glm::vec3(0.0f, 0.0f, -8.0f));
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &kTransform[0][0]);
 
 		//뷰잉 변환
 		glm::mat4 vTransform = glm::mat4(1.0f);
-		glm::vec3 cameraPos = glm::vec3(player_robot.x - 1.0f * sin(glm::radians(player_robot.y_radian)), 1.0f, player_robot.z - 1.0f * cos(glm::radians(player_robot.y_radian))); //--- 카메라 위치
-		glm::vec3 cameraDirection = glm::vec3(player_robot.x, 0.0f, player_robot.z); //--- 카메라 바라보는 방향
+		glm::vec3 cameraPos = glm::vec3(camera_move[0], camera_move[1], camera_move[2]);		//--- 카메라 위치
+		glm::vec3 cameraDirection = glm::vec3(camera_look[0], camera_look[1], camera_look[2]);	//--- 카메라 바라보는 방향
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
 		vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1025,17 +1070,17 @@ GLvoid drawScene()
 
 		//축
 		glm::mat4 axisTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
-		axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		axisTransForm = glm::rotate(axisTransForm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));//변환 행렬을 셰이더에 전달
+		axisTransForm = glm::rotate(axisTransForm, glm::radians(10.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		axisTransForm = glm::rotate(axisTransForm, glm::radians(25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(axisTransForm));	//변환 행렬을 셰이더에 전달
 
-		unsigned int indexLocation = glGetUniformLocation(shaderID, "index"); //--- object Color값 전달
-		unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos"); //--- lightPos 값 전달
-		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor"); //--- lightColor 값 전달
-		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor"); //--- object Color값 전달
+		unsigned int indexLocation = glGetUniformLocation(shaderID, "index");			//--- object Color값 전달
+		unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos");		//--- lightPos 값 전달
+		unsigned int lightColorLocation = glGetUniformLocation(shaderID, "lightColor");	//--- lightColor 값 전달
+		unsigned int objColorLocation = glGetUniformLocation(shaderID, "objectColor");	//--- object Color값 전달
 
 		//조명 위치 및 색
-		glUniform3f(lightPosLocation, 0.0f, 3.0f, 0.0f);
+		glUniform3f(lightPosLocation, 0.0f, 100.0f, 0.0f);
 		glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 
 		//오브젝트 색 지정
@@ -1045,27 +1090,26 @@ GLvoid drawScene()
 
 		/*여기에 로봇*/
 		{
-			glUniform3f(objColorLocation, player_robot.color[0], player_robot.color[1], player_robot.color[2]);
 			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
-			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, player_robot.y, player_robot.z));      //robot위치
-			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
-			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
+			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(player_robot.x, player_robot.y, player_robot.z));						//robot위치
+			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(player_robot.y_radian), glm::vec3(0.0f, 1.0f, 0.0f));					//보는 방향
+			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));														//size
 			/*오른다리*/ {
 				glUniform3f(objColorLocation, 0.0f, 0.6f, 0.6f);
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                                //몸 위치에 따라 조정
-				model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                                  //다리 흔들기
-				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
-				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));																//몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(0.0f, 0.0f, 1.0f));									//다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));																//원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /*왼다리*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                               //몸 위치에 따라 조정
-				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));                                 //다리 흔들기
-				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
-				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));																//몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(0.0f, 0.0f, 1.0f));									//다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));																//원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
@@ -1073,7 +1117,7 @@ GLvoid drawScene()
 				glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.0f, 0.35f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));                                                                      //size
+				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
@@ -1083,16 +1127,16 @@ GLvoid drawScene()
 				model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
 				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /*왼  팔*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
-				model = glm::rotate(model, glm::radians(player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(-player_robot.shake), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
@@ -1100,245 +1144,100 @@ GLvoid drawScene()
 				glUniform3f(objColorLocation, 0.6f, 0.0f, 0.6f);
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.0f, 0.55f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));                                                                       //size
+				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			}
 		}
 		/*이건 장애물 로봇*/
-		for (int i = 0; i < 9; ++i) {
-			glUniform3f(objColorLocation, block_robot[i].color[0], block_robot[i].color[1], block_robot[i].color[2]);
+		glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
+		for (int i = 0; i < 19; ++i) {
 			glm::mat4 shapeTransForm = glm::mat4(1.0f);//변환 행렬 생성 T
-			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(block_robot[i].x, 0.0f, block_robot[i].z));      //robot위치
-			shapeTransForm = glm::rotate(shapeTransForm, glm::radians(block_robot[i].y_radian), glm::vec3(0.0f, 1.0f, 0.0f));                 //보는 방향
-			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));                                                                      //size
+			shapeTransForm = glm::translate(shapeTransForm, glm::vec3(block_robot[i].x, 0.0f, block_robot[i].z));							//robot위치
+			shapeTransForm = glm::rotate(shapeTransForm, block_robot[i].y_radian, glm::vec3(0.0f, 1.0f, 0.0f));				//보는 방향
+			shapeTransForm = glm::scale(shapeTransForm, glm::vec3(2.0f, 2.0f, 2.0f));														//size
 			/*오른다리*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));                                                                //몸 위치에 따라 조정
-				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                  //다리 흔들기
-				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
-				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = glm::translate(model, glm::vec3(0.05f, 0.2f, 0.0f));																//몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(0.0f, 0.0f, 1.0f));								//다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));																//원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /*왼다리*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));                                                               //몸 위치에 따라 조정
-				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));                                 //다리 흔들기
-				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));                                                                //원점조정
-				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));                                                                      //size
+				model = glm::translate(model, glm::vec3(-0.05f, 0.2f, 0.0f));																//몸 위치에 따라 조정
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(0.0f, 0.0f, 1.0f));								//다리 흔들기
+				model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));																//원점조정
+				model = glm::scale(model, glm::vec3(0.05f, 0.1f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /* 몸통 */ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.0f, 0.35f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));                                                                      //size
+				model = glm::scale(model, glm::vec3(0.1f, 0.15f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /*오른팔*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.125f, 0.5f, 0.0f));
-				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake * 2), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /*왼  팔*/ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(-0.125f, 0.5f, 0.0f));
-				model = glm::rotate(model, glm::radians(block_robot[i].shake), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::radians(-block_robot[i].shake * 2), glm::vec3(1.0f, 0.0f, 0.0f));
 				model = glm::translate(model, glm::vec3(0.0f, -0.13f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));                                                                    //size
+				model = glm::scale(model, glm::vec3(0.025f, 0.13f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			} /* 머리 */ {
 				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 				model = glm::translate(model, glm::vec3(0.0f, 0.55f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));                                                                       //size
+				model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));																	//size
 				model = axisTransForm * shapeTransForm * model;
 				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 				glDrawArrays(GL_QUADS, 0, 24); //정육면체
 			}
-		}
-		/*이건 일단 축*/
-		{
-			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-			model = axisTransForm * model;
-			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-			glUniform3f(objColorLocation, 0.2f, 0.2f, 0.2f);
-			glDrawArrays(GL_LINES, 24, 6); //축
-		}
-		/*여기는 맵(바닥)*/
-		{
-			/*트랙1*/
-			{
-				glUniform3f(objColorLocation, 0.75f, 0.75f, 1.0f);
-
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(200.0f + 1.0f - 2.0f, 0.0f, 1.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f + 2.0f));
-				model = glm::scale(model, glm::vec3(200.0f, 0.0f, 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(-200.0f - 1.0f + 2.0f, 0.0f, 1.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-			}
-
-			/*트랙2*/
-			{
-				glUniform3f(objColorLocation, 0.5f, 0.5f, 1.0f);
-
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(200.0f + 1.0f, 0.0f, 0.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f));
-				model = glm::scale(model, glm::vec3(200.0f + 1.0f, 0.0f, 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(-200.0f - 1.0f, 0.0f, 0.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-			}
-
-			/*트랙3*/
-			{
-				glUniform3f(objColorLocation, 0.25f, 0.25f, 1.0f);
-
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(200.0f + 1.0f + 2.0f, 0.0f, -1.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(0.0f, 0.0f, -150.0f - 2.0f));
-				model = glm::scale(model, glm::vec3(200.0f + 1.0f + 1.0f, 0.0f, 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-
-				model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(-200.0f - 1.0f - 2.0f, 0.0f, -1.0f));
-				model = glm::scale(model, glm::vec3(1.0f, 0.0f, 150.0f + 1.0f + 1.0f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-				glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
-			}
-		}
-		/*골대*/
-		{
-			/*기둥1*/
-			{
-				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(203.9f, 2.0f, 149.f));
-				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-				glDrawArrays(GL_QUADS, 0, 24);
-			}
-
-			/*기둥2*/
-			{
-				glUniform3f(objColorLocation, 0.5f, 0.25f, 0.25f);
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(198.1f, 2.0f, 149.f));
-				model = glm::scale(model, glm::vec3(0.1f, 2.0f, 0.1f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-				glDrawArrays(GL_QUADS, 0, 24);
-			}
-
-			/*깃발*/
-			{
-				glUniform3f(objColorLocation, 1.f, 1.f, 1.f);
-				glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-				model = glm::translate(model, glm::vec3(201.f, 3.2f, 148.f));
-				model = glm::scale(model, glm::vec3(3.0f, 0.8f, 1.f));
-				model = axisTransForm * model;
-				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-				glDrawArrays(GL_QUADS, 0, 4);
-			}
-		}
-		/*Start 지점*/
-		{
-			glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
-
-			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::translate(model, glm::vec3(-201.0f, 0.5f, 149.0f));
-			model = glm::scale(model, glm::vec3(3.0f, 0.0f, 0.1f));
-			model = axisTransForm * model;
-			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-			glDrawArrays(GL_QUADS, 30, 4); //사각형 크기 1.0 x 0.0 x 1.0
 		}
 		/*큐브맵*/
 		{
 			glUniform1i(indexLocation, 1);
 			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::scale(model, glm::vec3(250.0f, 10.0f, 200.0f));
+			model = glm::scale(model, glm::vec3(25.0f, 25.0f, 25.0f));
 			model = axisTransForm * model;
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[0]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[0]);
 			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[1]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[1]);
 			glDrawArrays(GL_QUADS, 4, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[2]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[2]);
 			glDrawArrays(GL_QUADS, 8, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[3]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[3]);
 			glDrawArrays(GL_QUADS, 12, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[4]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[4]);
 			glDrawArrays(GL_QUADS, 16, 4); //사각형 크기 1.0 x 0.0 x 1.0
 
-			glBindTexture(GL_TEXTURE_2D, texture_index[5]);
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[5]);
 			glDrawArrays(GL_QUADS, 20, 4); //사각형 크기 1.0 x 0.0 x 1.0
 		}
-
 	}
 
 	glutSwapBuffers();
@@ -1352,8 +1251,12 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'm':
-		player_robot.move = true;
-		player_robot.shake_dir = 1;
+		if (player_robot.move)
+			player_robot.move = false;
+		else
+			player_robot.move = true;
+		if (player_robot.shake_dir == 0)
+			player_robot.shake_dir = 1;
 		break;
 	case't':
 		player_robot.x = 201, player_robot.z = 140, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
@@ -1371,7 +1274,7 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 {
 	switch (key) {
 	case GLUT_KEY_UP:
-		if (player_robot.speed < 0.05f)
+		if (player_robot.speed < 0.25f)
 			player_robot.speed += 0.001f;
 		break;
 	case GLUT_KEY_DOWN:
@@ -1379,10 +1282,12 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 			player_robot.speed -= 0.01f;
 		break;
 	case GLUT_KEY_LEFT:
-		player_robot.y_radian += 45.0f;
+		if (!end)
+			player_robot.y_radian += 45.0f;
 		break;
 	case GLUT_KEY_RIGHT:
-		player_robot.y_radian -= 45.0f;
+		if (!end)
+			player_robot.y_radian -= 45.0f;
 		break;
 	default:
 		break;
@@ -1392,105 +1297,135 @@ GLvoid SpecialKeyBoard(int key, int x, int y)
 
 GLvoid TimerFunc(int x)
 {
-	if (player_robot.move) {
-		if(collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb)|| collision(map_bb3, player_robot.bb)){
-			player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
-			player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+	if (end) {
+		player_robot.shake += player_robot.shake_dir * 1.0f;
+		if (player_robot.shake <= 0.0f || player_robot.shake >= 60.0f)
+			player_robot.shake_dir *= -1;
+		for (int i = 0; i < 9; ++i) {
+			block_robot[i].shake += block_robot[i].shake_dir * player_robot.speed;
+			if (block_robot[i].shake <= 0.0f || block_robot[i].shake >= 60.0f)
+				block_robot[i].shake_dir *= -1;
+		}
+	}
+	else {
+		if (player_robot.move) {
+			if (collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb) || collision(map_bb3, player_robot.bb)) {
+				player_robot.x += sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
+				player_robot.z += cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+				player_robot.bb = get_bb(player_robot);
+			}
+			else {
+				player_robot.y -= 0.1f;
+				player_robot.speed = 0.0f;
+				player_robot.move = false;
+			}
+			player_robot.shake += player_robot.shake_dir * 20 * player_robot.speed;
+			if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
+				player_robot.shake_dir *= -1;
+			if (player_robot.speed < 0.25f)
+				player_robot.speed += 0.001f;
+
+			if (collision(goal, player_robot.bb)) {
+				finish_time = time(NULL);
+				player_robot.x = 0.0f, player_robot.z = 0.0f, player_robot.y = 0.0f, player_robot.y_radian = 0.0f, 
+					player_robot.shake = 0.0f, player_robot.shake_dir = 1;
+				player_robot.move = false;
+				end = true;
+				std::cout << (double)(finish_time - start_time) << '\n';
+			}
+		}
+		if (player_robot.y < 0) {
+			player_robot.y -= player_robot.speed;
+			player_robot.speed += 0.01f;
+
+			if (player_robot.y < -5.f) {
+				player_robot.y_radian = 180.0f, player_robot.shake_dir = 0, player_robot.shake = false, player_robot.speed = 0.0f;;
+				player_robot.x = -201, player_robot.z = 150, player_robot.y = 0.f;
+				player_robot.bb = get_bb(player_robot);
+			}
+		}
+
+		for (int i = 0; i < 19; ++i) {
+			if (end) {
+				if (i < 2) {
+					block_robot[i].x = 1.0f * (i % 5) - 2.0f;
+					block_robot[i].z = -1.0f * (i / 5);
+				}
+				else {
+					block_robot[i].x = 1.0f * ((i + 1) % 5) - 2.0f;
+					block_robot[i].z = -1.0f * ((i + 1) / 5);
+				}
+				block_robot[i].y_radian = atan2(player_robot.x - player_robot.x, player_robot.x - player_robot.x);
+				block_robot[i].shake = 0.0f; block_robot[i].shake_dir = 1;
+			}
+			else {
+				if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
+					player_robot.move = false;
+					player_robot.x -= sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
+					player_robot.z -= cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+					player_robot.speed = 0;
+					player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
+					player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
+					glutTimerFunc(10, Bump, i);
+				}
+				else {
+					block_robot[i].x += sin(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+					block_robot[i].z += cos(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+					block_robot[i].bb = get_bb(block_robot[i]);
+					block_robot[i].shake += block_robot[i].shake_dir * 20 * block_robot[i].speed;
+					if (block_robot[i].shake <= -60.0f || block_robot[i].shake >= 60.0f)
+						block_robot[i].shake_dir *= -1;
+					if ((block_robot[i].road[0][0] < block_robot[i].x and block_robot[i].x < block_robot[i].road[1][0]) ||
+						(block_robot[i].road[0][0] > block_robot[i].x and block_robot[i].x > block_robot[i].road[1][0]) ||
+						(block_robot[i].road[0][1] < block_robot[i].z and block_robot[i].z < block_robot[i].road[1][1]) ||
+						(block_robot[i].road[0][1] > block_robot[i].z and block_robot[i].z > block_robot[i].road[1][1]));
+					else
+						block_robot[i].y_radian += 180.0f;
+
+					if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
+						player_robot.move = false;
+						block_robot[i].x -= sin(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+						block_robot[i].z -= cos(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
+						player_robot.x -= sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
+						player_robot.z -= cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
+						player_robot.speed = 0;
+						player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
+						player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
+						glutTimerFunc(10, Bump, i);
+					}
+				}
+			}
+		}
+	}
+	glutTimerFunc(10, TimerFunc, 1);
+	glutPostRedisplay();
+}
+GLvoid Bump(int index)
+{
+	if (!end) {
+		if (collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb) || collision(map_bb3, player_robot.bb)) {
+			GLfloat radian = atan2(player_robot.road[0][1] - player_robot.road[1][1], player_robot.road[1][0] - player_robot.road[0][0]);
+			player_robot.x += sin(radian) * player_robot.speed;
+			player_robot.z += cos(radian) * player_robot.speed;
 			player_robot.bb = get_bb(player_robot);
 		}
 		else {
 			player_robot.y -= 0.1f;
 			player_robot.speed = 0.0f;
-			player_robot.move = false;
 		}
-		player_robot.shake += player_robot.shake_dir * 20 * player_robot.speed;
-		if (player_robot.shake <= -60.0f || player_robot.shake >= 60.0f)
-			player_robot.shake_dir *= -1;
+
 		if (player_robot.speed < 0.25f)
 			player_robot.speed += 0.001f;
 
-		if (collision(goal, player_robot.bb)) {
-			finish_time = time(NULL);
-			player_robot.x = 0.f, player_robot.z = 0.f, player_robot.y = 0.f, player_robot.y_radian = 0.0f;
-			player_robot.move = false;
-			end = true;
-			std::cout << (double)(finish_time - start_time) << '\n';
-		}
+		glm::vec2 road_spots = glm::vec2(player_robot.road[0][0], player_robot.road[0][1]);
+		glm::vec2 player_spots = glm::vec2(player_robot.x, player_robot.z);
+
+		if (player_robot.y < 0.0f);
+		else if (index < 19 && glm::distance(road_spots, player_spots) < 2.0f)
+			glutTimerFunc(10, Bump, index);
+		else
+			player_robot.move = true;
 	}
-	if (player_robot.y < 0) {
-		player_robot.y -= player_robot.speed;
-		player_robot.speed += 0.01f;
-
-		if (player_robot.y < -5.f) {
-			player_robot.y_radian = 180.0f, player_robot.shake_dir = 0, player_robot.shake = false, player_robot.speed = 0.0f;;
-			player_robot.x = -201, player_robot.z = 150, player_robot.y = 0.f;
-			player_robot.bb = get_bb(player_robot);
-		}
-	}
-
-	for (int i = 0; i < 9; ++i) {
-		if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
-			player_robot.speed = 0;
-			player_robot.move = false;
-			player_robot.x -= sin(glm::radians(player_robot.y_radian)) * 0.01f;
-			player_robot.z -= cos(glm::radians(player_robot.y_radian)) * 0.01f;
-			player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
-			player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
-			glutTimerFunc(10, Bump, i);
-		}
-		else {
-			block_robot[i].x += sin(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
-			block_robot[i].z += cos(glm::radians(block_robot[i].y_radian)) * block_robot[i].speed;
-			block_robot[i].bb = get_bb(block_robot[i]);
-			block_robot[i].shake += block_robot[i].shake_dir * 20 * block_robot[i].speed;
-			if (block_robot[i].shake <= -60.0f || block_robot[i].shake >= 60.0f)
-				block_robot[i].shake_dir *= -1;
-			if ((block_robot[i].road[0][0] < block_robot[i].x and block_robot[i].x < block_robot[i].road[1][0]) ||
-				(block_robot[i].road[0][0] > block_robot[i].x and block_robot[i].x > block_robot[i].road[1][0]) ||
-				(block_robot[i].road[0][1] < block_robot[i].z and block_robot[i].z < block_robot[i].road[1][1]) ||
-				(block_robot[i].road[0][1] > block_robot[i].z and block_robot[i].z > block_robot[i].road[1][1]));
-			else
-				block_robot[i].y_radian += 180.0f;
-
-			if (player_robot.move && collision(block_robot[i].bb, player_robot.bb)) {
-				player_robot.speed = 0;
-				player_robot.move = false;
-				player_robot.x -= sin(glm::radians(player_robot.y_radian)) * 0.01f;
-				player_robot.z -= cos(glm::radians(player_robot.y_radian)) * 0.01f;
-				player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
-				player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
-				glutTimerFunc(10, Bump, i);
-			}
-		}
-	}
-
-	glutTimerFunc(10, TimerFunc, 1);
-	glutPostRedisplay();
-}
-GLvoid Bump(int index) 
-{
-	if (collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb) || collision(map_bb3, player_robot.bb)) {
-		GLfloat radian = atan2(player_robot.road[0][1] - player_robot.road[1][1], player_robot.road[1][0] - player_robot.road[0][0]);
-		player_robot.x += sin(radian) * player_robot.speed;
-		player_robot.z += cos(radian) * player_robot.speed;
-		player_robot.bb = get_bb(player_robot);
-	}
-	else {
-		player_robot.y -= 0.1f;
-		player_robot.speed = 0.0f;
-	}
-
-	if (player_robot.speed < 0.25f)
-		player_robot.speed += 0.001f;
-
-	glm::vec2 road_spots = glm::vec2(player_robot.road[0][0], player_robot.road[0][1]);
-	glm::vec2 player_spots = glm::vec2(player_robot.x, player_robot.z);
-
-	if (player_robot.y < 0.0f);
-	else if (index < 3 && glm::distance(road_spots, player_spots) < 2.0f)
-		glutTimerFunc(10, Bump, index);
-	else
-		player_robot.move = true;
 }
 
 BB get_bb(Robot robot)

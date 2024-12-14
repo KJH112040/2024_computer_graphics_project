@@ -18,23 +18,22 @@ uniform vec3 lightColor; //--- 응용 프로그램에서 설정한 조명 색상
 
 void main(void) 
 {	
-//	float ambientLight = 0.3; //--- 주변 조명 계수
-//	vec3 ambient = ambientLight * lightColor; //--- 주변 조명 값
-//	
-//	vec3 normalVector = normalize (Normal);
-//	vec3 lightDir = normalize (lightPos - FragPos); //--- 표면과 조명의 위치로 조명의 방향을 결정한다.
-//	float diffuseLight = max (dot (normalVector, lightDir), 0.0); //--- N과 L의 내적 값으로 강도 조절: 음수 방지
-//	vec3 diffuse = diffuseLight * lightColor; //--- 산란 반사 조명값: 산란반사값 * 조명색상값
-//	
-//	vec3 result = (ambient + diffuse) * objectColor; //--- 최종 조명 설정된 픽셀 색상: (주변+산란반사+거울반사조명)*객체 색상
-//
-//	FragColor = vec4 (result, 1.0);
+	float ambientLight = 0.75; //--- 주변 조명 계수
+	vec3 ambient = ambientLight * lightColor; //--- 주변 조명 값
+	
+	vec3 normalVector = normalize (Normal);
+	vec3 lightDir = normalize (lightPos - FragPos); //--- 표면과 조명의 위치로 조명의 방향을 결정한다.
+	float diffuseLight = max (dot (normalVector, lightDir), 0.0); //--- N과 L의 내적 값으로 강도 조절: 음수 방지
+	vec3 diffuse = diffuseLight * lightColor; //--- 산란 반사 조명값: 산란반사값 * 조명색상값
+	
+	vec3 result = (ambient + diffuse) * objectColor; //--- 최종 조명 설정된 픽셀 색상: (주변+산란반사+거울반사조명)*객체 색상
+
 	switch(index){
 	case 0:
-		FragColor = vec4 (objectColor, 1.0);
+		FragColor = vec4 (result, 1.0);
 		break;
 	case 1:
-		FragColor = texture (outTexture1, out_TexCoord) + texture (outTexture2, out_TexCoord) + texture (outTexture3, out_TexCoord) + texture (outTexture4, out_TexCoord) + texture (outTexture5, out_TexCoord) + texture (outTexture6, out_TexCoord);
+		FragColor = ( texture (outTexture1, out_TexCoord) + texture (outTexture2, out_TexCoord) + texture (outTexture3, out_TexCoord) + texture (outTexture4, out_TexCoord) + texture (outTexture5, out_TexCoord) + texture (outTexture6, out_TexCoord) ) *  vec4 (result, 1.0);
 		break;
 	}
 }
