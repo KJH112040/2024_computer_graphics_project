@@ -3,12 +3,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-//#include <gl/glm/glm.hpp>
-//#include <gl/glm/ext.hpp>
-//#include <gl/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/glm/glm.hpp>
-#include <gl/glm/glm/ext.hpp>
-#include <gl/glm/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/glm/glm.hpp>
+//#include <gl/glm/glm/ext.hpp>
+//#include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <Windows.h>
 #include <ctime>
 #include <random>
@@ -427,24 +427,24 @@ void InitBuffer()
 
 		block_robot[11].road[0][0] = 196,	block_robot[11].road[0][1] = -148;
 		block_robot[11].road[1][0] = -196,	block_robot[11].road[1][1] = -148;
+		//
+		block_robot[12].road[0][0] = 198,	block_robot[12].road[0][1] = -110;
+		block_robot[12].road[1][0] = 204,	block_robot[12].road[1][1] = -110;
 
-		block_robot[12].road[0][0] = 200,	block_robot[12].road[0][1] = 0;
-		block_robot[12].road[1][0] = 200,	block_robot[12].road[1][1] = 0;
+		block_robot[13].road[0][0] = 204,	block_robot[13].road[0][1] = -40;
+		block_robot[13].road[1][0] = 198,	block_robot[13].road[1][1] = -40;
 
-		block_robot[13].road[0][0] = 200,	block_robot[13].road[0][1] = 0;
-		block_robot[13].road[1][0] = 190,	block_robot[13].road[1][1] = 0;
+		block_robot[14].road[0][0] = 203,	block_robot[14].road[0][1] = -40;
+		block_robot[14].road[1][0] = 203,	block_robot[14].road[1][1] = -110;
 
-		block_robot[14].road[0][0] = 200,	block_robot[14].road[0][1] = 0;
-		block_robot[14].road[1][0] = -200,	block_robot[14].road[1][1] = 0;
+		block_robot[15].road[0][0] = 199,	block_robot[15].road[0][1] = -40;
+		block_robot[15].road[1][0] = 199,	block_robot[15].road[1][1] = 20;
 
-		block_robot[15].road[0][0] = 200,	block_robot[15].road[0][1] = -152;
-		block_robot[15].road[1][0] = -200,	block_robot[15].road[1][1] = -152;
+		block_robot[16].road[0][0] = 200,	block_robot[16].road[0][1] = 50;
+		block_robot[16].road[1][0] = 200,	block_robot[16].road[1][1] = 140;
 
-		block_robot[16].road[0][0] = 198,	block_robot[16].road[0][1] = -150;
-		block_robot[16].road[1][0] = -198,	block_robot[16].road[1][1] = -150;
-
-		block_robot[17].road[0][0] = 196,	block_robot[17].road[0][1] = -148;
-		block_robot[17].road[1][0] = -196,	block_robot[17].road[1][1] = -148;
+		block_robot[17].road[0][0] = 202,	block_robot[17].road[0][1] = 140;
+		block_robot[17].road[1][0] = 202,	block_robot[17].road[1][1] = 50;
 	}
 	for (int i = 0; i < 19; ++i) {
 		block_robot[i].x = block_robot[i].road[0][0];
