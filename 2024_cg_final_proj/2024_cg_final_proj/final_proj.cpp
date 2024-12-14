@@ -1506,8 +1506,9 @@ GLvoid TimerFunc(int x)
 					player_robot.x -= sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
 					player_robot.z -= cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
 					player_robot.speed = 0;
+					GLfloat radian = atan2(player_robot.x - block_robot[i].x, player_robot.z - block_robot[i].z);
 					player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
-					player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
+					player_robot.road[1][0] = block_robot[i].x + 2.0f * sin(radian), player_robot.road[1][1] = block_robot[i].z + 2.0f * cos(radian);
 					glutTimerFunc(10, Bump, i);
 				}
 				else {
@@ -1531,8 +1532,9 @@ GLvoid TimerFunc(int x)
 						player_robot.x -= sin(glm::radians(player_robot.y_radian)) * player_robot.speed;
 						player_robot.z -= cos(glm::radians(player_robot.y_radian)) * player_robot.speed;
 						player_robot.speed = 0;
+						GLfloat radian = atan2(player_robot.x - block_robot[i].x, player_robot.z - block_robot[i].z);
 						player_robot.road[0][0] = block_robot[i].x, player_robot.road[0][1] = block_robot[i].z;
-						player_robot.road[1][0] = block_robot[i].x + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x), player_robot.road[1][1] = block_robot[i].z + 2.0f * (block_robot[i].z - player_robot.z) / (player_robot.x - block_robot[i].x);
+						player_robot.road[1][0] = block_robot[i].x + 2.0f * sin(radian), player_robot.road[1][1] = block_robot[i].z + 2.0f * cos(radian);
 						glutTimerFunc(10, Bump, i);
 					}
 				}
@@ -1546,9 +1548,9 @@ GLvoid Bump(int index)
 {
 	if (!end) {
 		if (collision(map_bb, player_robot.bb) || collision(map_bb2, player_robot.bb) || collision(map_bb3, player_robot.bb)) {
-			GLfloat radian = atan2(player_robot.road[0][1] - player_robot.road[1][1], player_robot.road[1][0] - player_robot.road[0][0]);
+			GLfloat radian = atan2(player_robot.road[1][0] - player_robot.road[0][0], player_robot.road[1][1] - player_robot.road[0][1]);
 			player_robot.x += sin(radian) * player_robot.speed;
-			player_robot.z -= cos(radian) * player_robot.speed;
+			player_robot.z += cos(radian) * player_robot.speed;
 			player_robot.bb = get_bb(player_robot);
 		}
 		else {
