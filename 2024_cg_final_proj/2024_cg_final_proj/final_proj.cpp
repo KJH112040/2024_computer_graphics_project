@@ -252,7 +252,7 @@ GLchar* vertexSource, * fragmentSource;
 GLuint shaderID;
 GLuint vertexShader;
 GLuint fragmentShader;
-unsigned int texture_runmap[6];
+unsigned int texture_runmap[16];
 BITMAPINFO* bmp;
 
 int main(int argc, char** argv)
@@ -468,7 +468,7 @@ void InitBuffer()
 }
 void InitTextures() 
 {
-	glGenTextures(6, texture_runmap);
+	glGenTextures(16, texture_runmap);
 	glUseProgram(shaderID);
 
 	//--- texture[0]
@@ -536,9 +536,119 @@ void InitTextures()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	unsigned char* data6 = LoadDIBitmap("right.bmp", &bmp);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data6);
+
+	//--- texture[6] - 0
+	int tLocation7 = glGetUniformLocation(shaderID, "outTexture7");
+	glUniform1i(tLocation7, 6);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[6]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data7 = LoadDIBitmap("N0.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data7);
+
+	//--- texture[7] - 1
+	int tLocation8 = glGetUniformLocation(shaderID, "outTexture8");
+	glUniform1i(tLocation8, 7);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[7]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data8 = LoadDIBitmap("N1.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data8);
+
+	//--- texture[8] - 2
+	int tLocation9 = glGetUniformLocation(shaderID, "outTexture9");
+	glUniform1i(tLocation9, 8);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[8]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data9 = LoadDIBitmap("N2.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data9);
+
+	//--- texture[9] - 3
+	int tLocation10 = glGetUniformLocation(shaderID, "outTexture10");
+	glUniform1i(tLocation10, 9);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[9]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data10 = LoadDIBitmap("N3.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data10);
+
+	//--- texture[10] - 4
+	int tLocation11 = glGetUniformLocation(shaderID, "outTexture11");
+	glUniform1i(tLocation11, 10);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[10]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data11 = LoadDIBitmap("N4.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data11);
+
+	//--- texture[11] - 5
+	int tLocation12 = glGetUniformLocation(shaderID, "outTexture12");
+	glUniform1i(tLocation12, 11);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[11]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data12 = LoadDIBitmap("N5.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data12);
+
+	//--- texture[12 - 6
+	int tLocation13 = glGetUniformLocation(shaderID, "outTexture13");
+	glUniform1i(tLocation13, 12);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[12]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data13 = LoadDIBitmap("N6.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data13);
+
+	//--- texture[13] - 7
+	int tLocation14 = glGetUniformLocation(shaderID, "outTexture14");
+	glUniform1i(tLocation14, 13);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[13]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data14 = LoadDIBitmap("N7.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data14);
+
+	//--- texture[14] - 8
+	int tLocation15 = glGetUniformLocation(shaderID, "outTexture15");
+	glUniform1i(tLocation15, 14);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[14]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data15 = LoadDIBitmap("N8.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data15);
+
+	//--- texture[15] - 9
+	int tLocation16 = glGetUniformLocation(shaderID, "outTexture16");
+	glUniform1i(tLocation16, 15);
+	glBindTexture(GL_TEXTURE_2D, texture_runmap[15]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned char* data16 = LoadDIBitmap("N9.bmp", &bmp);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_BGR, GL_UNSIGNED_BYTE, data16);
 }
 
-GLfloat camera_move[3]{ 0.0f, 2.0f, 2.0f }, camera_look[3]{ 0.0f, 0.5f, 0.0f }, light_pos[3]{ 0.0f, 2.0f, 2.0f };
+GLfloat camera_move[3]{ 0.0f, 2.0f, 2.5f }, camera_look[3]{ 0.0f, 0.5f, 0.0f }, light_pos[3]{ 0.0f, 2.0f, 2.0f }, camera_radian = 0.0f;
 int end_anime;
 BB map_bb{ -204.0f,-153.f,-198.f,151.f }, map_bb2{ -204.f,-153.f,204.f,-147.f }, map_bb3{ 198.0f,-153.f,204.f,151.f }, goal{198.f,149.f,204.f,151.f};
 bool end = false;
@@ -1067,9 +1177,9 @@ GLvoid drawScene()
 		glm::vec3 cameraDirection = glm::vec3(camera_look[0], camera_look[1], camera_look[2]);	//--- 카메라 바라보는 방향
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
-		vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		vTransform = glm::rotate(vTransform, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		vTransform = glm::lookAt(cameraPos, cameraDirection, cameraUp);
-		//vTransform = glm::rotate(vTransform, glm::radians(30.0f), glm::vec3(0.0, 1.0, 0.0));
+		vTransform = glm::rotate(vTransform, glm::radians(camera_radian), glm::vec3(0.0, 1.0, 0.0));
 		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &vTransform[0][0]);
 
 		//축
@@ -1243,6 +1353,20 @@ GLvoid drawScene()
 			glBindTexture(GL_TEXTURE_2D, texture_runmap[5]);
 			glDrawArrays(GL_QUADS, 20, 4); //사각형 크기 1.0 x 0.0 x 1.0
 		}
+		/*점수*/
+		int print_num = finish_time - start_time;
+		for (int i = 0; i < end_anime && i < read_ten(0, finish_time - start_time); ++i) {
+			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
+			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
+			model = glm::translate(model, glm::vec3(1.0f * i - 1.0f * read_ten(0, finish_time - start_time) / 2, 0.0f, 1.0f));
+			model = glm::scale(model, glm::vec3(0.5f, 1.0f, 0.0f));
+			model = axisTransForm * model;
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+			glBindTexture(GL_TEXTURE_2D, texture_runmap[6 + print_num % 10]);
+			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			print_num /= 10;
+		}
 	}
 
 	glutSwapBuffers();
@@ -1279,14 +1403,6 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
 GLvoid SpecialKeyBoard(int key, int x, int y)
 {
 	switch (key) {
-	case GLUT_KEY_UP:
-		if (player_robot.speed < 0.25f)
-			player_robot.speed += 0.001f;
-		break;
-	case GLUT_KEY_DOWN:
-		if (player_robot.speed > 0.0f)
-			player_robot.speed -= 0.01f;
-		break;
 	case GLUT_KEY_LEFT:
 		if (!end)
 			player_robot.y_radian += 45.0f;
@@ -1305,12 +1421,8 @@ GLvoid TimerFunc(int x)
 {
 	if (end) {
 		if (end_anime == 0) {
-			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, 1.0f));
-			glm::mat4 cameraPos_rotate = glm::rotate(cameraPos_rotate, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, -1.0f));
-			glm::vec4 rotate_pos = cameraPos_rotate * glm::vec4(camera_look[0], light_pos[1], light_pos[2], 1.0f);
-			camera_look[0] = rotate_pos[0], camera_look[2] = rotate_pos[2];
-			if (camera_look[0] == 0.0f)
+			camera_radian += 1.0f;
+			if (camera_radian == 180.0f)
 				end_anime++;
 		}
 		else if (end_anime < read_ten(0, finish_time - start_time)) {
@@ -1318,12 +1430,9 @@ GLvoid TimerFunc(int x)
 			end_anime++;
 		}
 		else if (end_anime == read_ten(0, finish_time - start_time)) {
-			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, 1.0f));
-			glm::mat4 cameraPos_rotate = glm::rotate(cameraPos_rotate, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 cameraPos_rotate = glm::translate(cameraPos_rotate, glm::vec3(0.0f, 0.0f, -1.0f));
-			glm::vec4 rotate_pos = cameraPos_rotate * glm::vec4(camera_look[0], light_pos[1], light_pos[2], 1.0f);
-			camera_look[0] = rotate_pos[0], camera_look[2] = rotate_pos[2];
-			if (camera_look[0] == 0.0f)
+			camera_radian -= 1.0f;
+			camera_move[2] += 0.1f;
+			if (camera_radian == 0.0f)
 				end_anime++;
 		}
 		else {
@@ -1331,7 +1440,7 @@ GLvoid TimerFunc(int x)
 			if (player_robot.shake <= 0.0f || player_robot.shake >= 60.0f)
 				player_robot.shake_dir *= -1;
 			for (int i = 0; i < 19; ++i) {
-				block_robot[i].shake += block_robot[i].shake_dir * player_robot.speed;
+				block_robot[i].shake += block_robot[i].shake_dir * 5.0f * player_robot.speed;
 				if (block_robot[i].shake <= 0.0f || block_robot[i].shake >= 60.0f)
 					block_robot[i].shake_dir *= -1;
 			}
