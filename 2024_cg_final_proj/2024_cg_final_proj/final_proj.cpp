@@ -1358,7 +1358,9 @@ GLvoid drawScene()
 		for (int i = 0; i < end_anime && i < read_ten(0, finish_time - start_time); ++i) {
 			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::translate(model, glm::vec3(1.0f * i - 1.0f * read_ten(0, finish_time - start_time) / 2, 0.0f, 1.0f));
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));
+			model = glm::rotate(model, glm::radians(camera_radian), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::translate(model, glm::vec3(1.0f * read_ten(0, finish_time - start_time) / 2 - 1.0f * i, 1.0f, -1.0f));
 			model = glm::scale(model, glm::vec3(0.5f, 1.0f, 0.0f));
 			model = axisTransForm * model;
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
