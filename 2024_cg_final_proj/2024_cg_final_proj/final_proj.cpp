@@ -35,7 +35,7 @@ GLvoid Reshape(int w, int h);
 GLvoid TimerFunc(int x);
 GLvoid Bump(int index);
 
-int read_ten(int Vplace,int num);
+int read_ten(int num);
 BB get_bb(Robot robot);
 bool collision(BB obj_a, BB obj_b);
 
@@ -464,7 +464,7 @@ void InitBuffer()
 			block_robot[i].y_radian = 180.0f;
 	}
 	player_robot.bb = get_bb(player_robot);
-	start_time = time(NULL);
+	start_time = int(time(NULL));
 }
 void InitTextures() 
 {
@@ -1356,12 +1356,12 @@ GLvoid drawScene()
 		}
 		/*점수*/
 		int print_num = finish_time - start_time;
-		for (int i = 0; i < end_anime && i < read_ten(0, finish_time - start_time); ++i) {
+		for (int i = 0; i < end_anime && i < read_ten(finish_time - start_time); ++i) {
 			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
 			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));
 			model = glm::rotate(model, glm::radians(camera_radian), glm::vec3(0.0f, 1.0f, 0.0f));
-			model = glm::translate(model, glm::vec3(1.0f * read_ten(0, finish_time - start_time) / 2 - 1.0f * i, 1.0f, 0.0f));
+			model = glm::translate(model, glm::vec3(1.0f * read_ten(finish_time - start_time) / 2 - 1.0f * i, 1.0f, 0.0f));
 			model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			model = glm::scale(model, glm::vec3(0.5f, 1.0f, 0.0f));
 			model = axisTransForm * model;
@@ -1429,11 +1429,11 @@ GLvoid TimerFunc(int x)
 			if (camera_radian == 180.0f)
 				end_anime++;
 		}
-		else if (end_anime < read_ten(0, finish_time - start_time)) {
+		else if (end_anime < read_ten(finish_time - start_time)) {
 			light_pos[1] += 0.1f;
 			end_anime++;
 		}
-		else if (end_anime == read_ten(0, finish_time - start_time)) {
+		else if (end_anime == read_ten(finish_time - start_time)) {
 			camera_radian += 1.0f;
 			camera_move[2] += 0.1f;
 			if (camera_radian == 360.0f)
@@ -1469,12 +1469,13 @@ GLvoid TimerFunc(int x)
 				player_robot.speed += 0.001f;
 
 			if (collision(goal, player_robot.bb)) {
-				finish_time = time(NULL);
+				finish_time = int(time(NULL));
 				player_robot.x = 0.0f, player_robot.z = 0.0f, player_robot.y = 0.0f, player_robot.y_radian = 0.0f, 
 					player_robot.shake = 0.0f, player_robot.shake_dir = 1;
 				player_robot.move = false;
 				end = true;
-				std::cout << (double)(finish_time - start_time) << '\n';
+				std::cout << finish_time - start_time << '\n';
+				std::cout << read_ten(finish_time - start_time) <<'\n';
 			}
 		}
 		if (player_robot.y < 0) {
@@ -1573,13 +1574,14 @@ GLvoid Bump(int index)
 	}
 }
 
-int read_ten(int Vplace, int num)
+int read_ten(int num)
 {
-	num /= 10, Vplace++;
-	if (num == 0)
-		return Vplace;
-	else
-		read_ten(Vplace, num);
+	int Vplace = 0;
+	while (num > 0) {
+		Vplace++;
+		num /= 10;
+	}
+	return Vplace;
 }
 BB get_bb(Robot robot)
 {
