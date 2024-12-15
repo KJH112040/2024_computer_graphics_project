@@ -1367,7 +1367,7 @@ GLvoid drawScene()
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 			glBindTexture(GL_TEXTURE_2D, texture_runmap[6 + print_num % 10]);
-			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			//glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
 			print_num /= 10;
 		}
 	}
