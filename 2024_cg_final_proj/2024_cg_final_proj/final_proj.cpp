@@ -1331,7 +1331,8 @@ GLvoid drawScene()
 			glUniform1i(indexLocation, 1);
 			glActiveTexture(GL_TEXTURE0); //--- 유닛 0을 활성화
 			glm::mat4 model = glm::mat4(1.0f);//변환 행렬 생성 T
-			model = glm::scale(model, glm::vec3(25.0f, 25.0f, 25.0f));
+			model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(26.0f, 5.0f, 26.0f));
 			model = axisTransForm * model;
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -1367,7 +1368,7 @@ GLvoid drawScene()
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 			glBindTexture(GL_TEXTURE_2D, texture_runmap[6 + print_num % 10]);
-			//glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
+			glDrawArrays(GL_QUADS, 0, 4); //사각형 크기 1.0 x 0.0 x 1.0
 			print_num /= 10;
 		}
 	}
@@ -1433,9 +1434,9 @@ GLvoid TimerFunc(int x)
 			end_anime++;
 		}
 		else if (end_anime == read_ten(0, finish_time - start_time)) {
-			camera_radian -= 1.0f;
+			camera_radian += 1.0f;
 			camera_move[2] += 0.1f;
-			if (camera_radian == 0.0f)
+			if (camera_radian == 360.0f)
 				end_anime++;
 		}
 		else {
